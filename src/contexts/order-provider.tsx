@@ -6,8 +6,7 @@ import React, { createContext, useCallback, useContext, useState, useEffect, use
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { useAuth } from "@/hooks/use-auth";
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
 
 interface OrderContextType {
   orders: Order[];
@@ -17,15 +16,12 @@ interface OrderContextType {
   updateOrderCoupon: (orderId: string, newCouponId: string) => void;
   getOrdersByStudent: (studentId: string) => Order[];
   getOrdersByStatus: (status: OrderStatus) => Order[];
-  toggleNotificationSubscription: (couponId: string, subscribed: boolean) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const prevOrdersRef = useRef<Order[]>([]);
-  const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -44,7 +40,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         });
         
         setOrders(newOrders);
-        prevOrdersRef.current = newOrders;
 
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
@@ -171,43 +166,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     return orders.filter(order => order.status === status);
   }, [orders]);
 
- const toggleNotificationSubscription = useCallback(async (couponId: string, subscribed: boolean) => {
-    if (!user) {
-      toast({ title: "Not Logged In", description: "You must be logged in to manage notifications.", variant: "destructive" });
-      return;
-    }
-
-    const userProfileRef = doc(db, "users", user.uid);
-
-    try {
-      if (subscribed) {
-        await updateDoc(userProfileRef, {
-          subscriptions: arrayUnion(couponId)
-        });
-        toast({
-          title: "Notifications Enabled",
-          description: `You will now receive a notification when order #${couponId} is ready.`,
-        });
-      } else {
-        await updateDoc(userProfileRef, {
-          subscriptions: arrayRemove(couponId)
-        });
-        toast({
-          title: "Notifications Disabled",
-          description: `You will no longer receive notifications for order #${couponId}.`,
-        });
-      }
-    } catch (error) {
-      console.error("Error updating subscription:", error);
-      toast({
-        title: "Update Failed",
-        description: "Could not update your notification preferences. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [user, toast]);
-
-
   const value = {
     orders,
     addOrder,
@@ -216,7 +174,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     updateOrderCoupon,
     getOrdersByStudent,
     getOrdersByStatus,
-    toggleNotificationSubscription
   };
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;

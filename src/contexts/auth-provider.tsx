@@ -57,27 +57,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signUpWithEmail = async (email: string, password: string, profileData: Partial<Omit<UserProfile, 'uid'>>) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    
-    const userRef = doc(db, "users", user.uid);
-    const isCustomer = !!profileData.name;
-    
-    const dataToSet: UserProfile = {
-      uid: user.uid,
-      name: profileData.name || '',
-      email: user.email || '',
-      role: isCustomer ? 'customer' : 'manager',
-      subscriptions: [],
-    };
-    
-    if (isCustomer) {
-      dataToSet.dob = profileData.dob || undefined;
-    }
-    
-    await setDoc(userRef, dataToSet);
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        const userRef = doc(db, "users", user.uid);
+        
+        const dataToSet: UserProfile = {
+          uid: user.uid,
+          name: profileData.name || '',
+          email: user.email || '',
+          role: 'manager',
+        };
+        
+        await setDoc(userRef, dataToSet);
 
-    return userCredential;
+        return userCredential;
+    } catch(error) {
+        console.error("Error during sign up:", error);
+        throw error;
+    }
   }
 
   const signOutUser = () => {

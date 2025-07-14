@@ -22,13 +22,13 @@ export default function RoleSelectionPage() {
           href="/student"
           icon={<User className="w-12 h-12 text-primary" />}
           title="Customer"
-          description="View your order status and get notifications."
+          description="View the live order status display."
         />
         <RoleCard
           href="/login"
           icon={<ChefHat className="w-12 h-12 text-primary" />}
           title="Order Manager"
-          description="Manage orders by coupon and get kitchen insights."
+          description="Manage orders and get kitchen insights."
         />
       </main>
       <footer className="mt-20 text-center text-muted-foreground text-sm">
