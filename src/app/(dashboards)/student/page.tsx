@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 
 export default function StudentDashboardPage() {
-  const { orders, notificationSubscriptions, toggleNotificationSubscription } = useOrders();
+  const { orders } = useOrders();
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
   const { user, userProfile, loading } = useAuth();
   const router = useRouter();
@@ -25,29 +25,9 @@ export default function StudentDashboardPage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
-        Notification.requestPermission();
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     const nonCompletedOrders = orders.filter(o => o.status === 'Preparing' || o.status === 'Ready');
     setCurrentOrders(nonCompletedOrders);
   }, [orders]);
-
-  const handleToggleSubscription = (orderId: string) => {
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          toggleNotificationSubscription(orderId);
-        }
-      });
-    } else {
-      toggleNotificationSubscription(orderId);
-    }
-  }
 
   const readyOrders = currentOrders.filter(o => o.status === 'Ready');
   const preparingOrders = currentOrders.filter(o => o.status === 'Preparing');
@@ -64,7 +44,7 @@ export default function StudentDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Order Status</h1>
-        <p className="text-muted-foreground mt-1">Track the real-time status of your food order. Click the bell on a preparing coupon to get notified when it's ready.</p>
+        <p className="text-muted-foreground mt-1">Track the real-time status of your food order.</p>
       </div>
 
       <DashboardSection 
@@ -81,9 +61,6 @@ export default function StudentDashboardPage() {
         orders={preparingOrders} 
         emptyMessage="You have no orders being prepared." 
         className="bg-sky-100/60 dark:bg-sky-900/30 border-sky-300/20 dark:border-sky-700/50"
-        isPreparingSection
-        notificationSubscriptions={notificationSubscriptions}
-        onToggleSubscription={handleToggleSubscription}
       />
     </div>
   );
@@ -95,9 +72,6 @@ interface DashboardSectionProps {
     orders: Order[];
     emptyMessage: string;
     className?: string;
-    isPreparingSection?: boolean;
-    notificationSubscriptions?: string[];
-    onToggleSubscription?: (orderId: string) => void;
 }
 
 function DashboardSection({ 
@@ -106,9 +80,6 @@ function DashboardSection({
     orders, 
     emptyMessage, 
     className, 
-    isPreparingSection = false, 
-    notificationSubscriptions, 
-    onToggleSubscription,
 }: DashboardSectionProps) {
     return (
         <Card className={cn("border shadow-sm", className)}>
@@ -134,9 +105,6 @@ function DashboardSection({
                                 <OrderCard 
                                     order={order} 
                                     role="student" 
-                                    showBell={isPreparingSection}
-                                    isSubscribed={isPreparingSection && notificationSubscriptions?.includes(order.id)}
-                                    onToggleSubscription={onToggleSubscription}
                                 />
                             </motion.div>
                         ))}

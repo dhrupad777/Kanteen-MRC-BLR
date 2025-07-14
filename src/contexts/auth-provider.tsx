@@ -72,7 +72,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isCustomer) {
       dataToSet.dob = profileData.dob || undefined;
-      dataToSet.subscriptions = [];
     }
     
     await setDoc(userRef, dataToSet);
