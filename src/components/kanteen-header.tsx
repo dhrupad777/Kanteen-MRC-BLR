@@ -25,7 +25,6 @@ export function KanteenHeader() {
   }
 
   const isDashboard = pathname.startsWith('/student') || pathname.startsWith('/staff');
-  const isStaffPage = pathname.startsWith('/staff');
   const isStudentPage = pathname.startsWith('/student');
   
   const getFirstName = (profile: UserProfile | null) => {
@@ -36,35 +35,33 @@ export function KanteenHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <Link href="/" className="flex items-center gap-2 mr-8">
+        <Link href="/" className="flex items-center gap-2 mr-auto">
           <ChefHat className="h-7 w-7 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">Kanteen</span>
         </Link>
         
-        <div className="flex-1 flex items-center justify-end gap-4">
-           {isStudentPage && userProfile && (
-            <span className="text-sm text-muted-foreground hidden sm:block">
-              Welcome, {getFirstName(userProfile)}!
+        <div className="flex items-center justify-end gap-4">
+           {isStudentPage && userProfile?.name && (
+            <span className="text-sm font-medium text-foreground/80 hidden sm:block">
+              Hello, {getFirstName(userProfile)}!
             </span>
           )}
 
           {isDashboard && (
-             <Button asChild variant="ghost">
+             <Button asChild variant="outline" size="sm">
                <Link href="/">
-                 <LogOut className="mr-2 h-4 w-4" />
                  Switch Role
                </Link>
              </Button>
           )}
 
           {user && (
-            <Button variant="ghost" onClick={handleSignOut}>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </Button>
           )}
         </div>
-
       </div>
     </header>
   )
