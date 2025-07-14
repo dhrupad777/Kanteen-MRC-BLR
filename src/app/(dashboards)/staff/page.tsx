@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order, OrderStatus } from '@/types';
-import { ChefHat, CookingPot } from 'lucide-react';
+import { CookingPot, ChefHat } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 import { cn } from '@/lib/utils';
 import {
