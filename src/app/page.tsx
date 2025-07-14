@@ -61,5 +61,3 @@ function RoleCard({ href, icon, title, description }: RoleCardProps) {
     </Link>
   );
 }
-
-    
