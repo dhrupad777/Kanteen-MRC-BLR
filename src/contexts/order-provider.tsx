@@ -6,8 +6,7 @@ import React, { createContext, useCallback, useContext, useState, useEffect, use
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { useAuth } from "@/hooks/use-auth";
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
 
 interface OrderContextType {
   orders: Order[];
@@ -24,7 +23,6 @@ interface OrderContextType {
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const prevOrdersRef = useRef<Order[]>([]);
@@ -48,17 +46,16 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleNotificationSubscription = useCallback((orderId: string) => {
-    setNotificationSubscriptions(prev => {
-        const isSubscribed = prev.includes(orderId);
-        if (isSubscribed) {
-            toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-            return prev.filter(id => id !== orderId);
-        } else {
-            toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-            return [...prev, orderId];
-        }
-    });
-  }, [toast]);
+    const isSubscribed = notificationSubscriptions.includes(orderId);
+    
+    if (isSubscribed) {
+      setNotificationSubscriptions(prev => prev.filter(id => id !== orderId));
+      toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
+    } else {
+      setNotificationSubscriptions(prev => [...prev, orderId]);
+      toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
+    }
+  }, [notificationSubscriptions, toast]);
 
 
   useEffect(() => {
@@ -81,8 +78,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
                 if (subscriptionsRef.current.includes(newOrder.id)) {
                     sendReadyNotification(newOrder);
-                    // No longer need to update firestore, but we can remove it from local state
-                     setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
+                    setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
                 }
             }
         });
