@@ -45,21 +45,20 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleNotificationSubscription = useCallback((orderId: string) => {
-    setNotificationSubscriptions(prevSubs => {
-        const isSubscribed = prevSubs.includes(orderId);
-        const newSubs = isSubscribed
-            ? prevSubs.filter(id => id !== orderId)
-            : [...prevSubs, orderId];
-
-        if (!isSubscribed) {
-            toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-        } else {
-             toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-        }
-        
-        return newSubs;
-    });
+    setTimeout(() => {
+      setNotificationSubscriptions(prevSubs => {
+          const isSubscribed = prevSubs.includes(orderId);
+          if (isSubscribed) {
+              toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
+              return prevSubs.filter(id => id !== orderId);
+          } else {
+              toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
+              return [...prevSubs, orderId];
+          }
+      });
+    }, 0);
   }, [toast]);
+
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
@@ -76,15 +75,11 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             });
         });
 
-        // This is the crucial part: compare old orders with new ones
         newOrders.forEach(newOrder => {
             const oldOrder = prevOrdersRef.current.find(o => o.id === newOrder.id);
-            // If status changed from 'Preparing' to 'Ready'
             if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
-                // And if we are subscribed to this order
                 if (subscriptionsRef.current.includes(newOrder.id)) {
                     sendReadyNotification(newOrder);
-                    // Clean up subscription after notification
                     setNotificationSubscriptions(subs => subs.filter(id => id !== newOrder.id));
                 }
             }
