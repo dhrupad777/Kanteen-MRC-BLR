@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Utensils, Home, User, UtensilsCrossed } from "lucide-react"
+import { Utensils, Home, User, UtensilsCrossed, MonitorPlay } from "lucide-react"
 import { usePathname } from 'next/navigation'
 import { cn } from "@/lib/utils"
 
@@ -11,6 +11,7 @@ export function KanteenHeader() {
     { href: "/", label: "Home", icon: <Home className="w-4 h-4" /> },
     { href: "/student", label: "Student", icon: <User className="w-4 h-4" /> },
     { href: "/staff", label: "Staff", icon: <UtensilsCrossed className="w-4 h-4" /> },
+    { href: "/ready-display", label: "Display", icon: <MonitorPlay className="w-4 h-4" /> },
   ]
 
   return (
@@ -27,7 +28,7 @@ export function KanteenHeader() {
               href={link.href}
               className={cn(
                 "flex items-center gap-2 transition-colors hover:text-primary",
-                pathname === link.href ? "text-primary" : "text-muted-foreground"
+                pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? "text-primary" : "text-muted-foreground"
               )}
             >
               {link.icon}

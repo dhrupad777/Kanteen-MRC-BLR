@@ -1,11 +1,14 @@
 import Link from 'next/link';
-import { ArrowRight, User, UtensilsCrossed } from 'lucide-react';
+import { ArrowRight, User, UtensilsCrossed, MonitorPlay } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { KanteenHeader } from '@/components/kanteen-header';
 
 export default function RoleSelectionPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+    <>
+    <KanteenHeader />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 -mt-16">
       <header className="text-center mb-12">
         <h1 className="font-headline text-5xl md:text-7xl font-bold text-primary">
           Kanteen
@@ -15,7 +18,7 @@ export default function RoleSelectionPage() {
         </p>
       </header>
 
-      <main className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+      <main className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
         <RoleCard
           href="/student"
           icon={<User className="w-12 h-12 text-primary" />}
@@ -26,13 +29,20 @@ export default function RoleSelectionPage() {
           href="/staff"
           icon={<UtensilsCrossed className="w-12 h-12 text-primary" />}
           title="Canteen Staff"
-          description="Manage orders and get insights on kitchen performance."
+          description="Manage orders by coupon and get kitchen insights."
+        />
+         <RoleCard
+          href="/ready-display"
+          icon={<MonitorPlay className="w-12 h-12 text-primary" />}
+          title="Ready Display"
+          description="A public screen showing all orders ready for pickup."
         />
       </main>
       <footer className="mt-16 text-center text-muted-foreground text-sm">
         <p>&copy; {new Date().getFullYear()} Kanteen. All rights reserved.</p>
       </footer>
     </div>
+    </>
   );
 }
 
@@ -52,7 +62,7 @@ function RoleCard({ href, icon, title, description }: RoleCardProps) {
           <CardTitle className="font-headline text-3xl">{title}</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-muted-foreground mb-6">{description}</p>
+          <p className="text-muted-foreground mb-6 h-12">{description}</p>
           <Button variant="ghost" className="text-primary group-hover:text-accent font-bold">
             Go to Dashboard <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>

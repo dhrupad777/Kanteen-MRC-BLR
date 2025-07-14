@@ -7,45 +7,32 @@ import { useToast } from "@/hooks/use-toast"
 
 
 const initialOrders: Order[] = [
+  // Keeping some examples for different statuses
   {
-    id: 'ORD-001',
+    id: 'CPN-101',
     studentId: 'student-007',
-    items: [{ name: 'Spicy Chicken Burger', quantity: 1 }, { name: 'Fries', quantity: 1 }],
-    status: 'Pending',
-    createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-  },
-  {
-    id: 'ORD-002',
-    studentId: 'student-123',
-    items: [{ name: 'Veggie Wrap', quantity: 1 }],
-    status: 'Pending',
-    createdAt: new Date(Date.now() - 3 * 60 * 1000),
-  },
-  {
-    id: 'ORD-003',
-    studentId: 'student-456',
-    items: [{ name: 'Pasta Alfredo', quantity: 1 }, { name: 'Garlic Bread', quantity: 2 }],
+    items: [{ name: 'Coupon Meal', quantity: 1 }],
     status: 'Preparing',
     createdAt: new Date(Date.now() - 10 * 60 * 1000),
   },
   {
-    id: 'ORD-004',
-    studentId: 'student-007',
-    items: [{ name: 'Iced Coffee', quantity: 1 }],
+    id: 'CPN-102',
+    studentId: 'student-123',
+    items: [{ name: 'Coupon Meal', quantity: 1 }],
     status: 'Preparing',
     createdAt: new Date(Date.now() - 8 * 60 * 1000),
   },
   {
-    id: 'ORD-005',
-    studentId: 'student-789',
-    items: [{ name: 'Margherita Pizza', quantity: 1 }],
+    id: 'CPN-103',
+    studentId: 'student-456',
+    items: [{ name: 'Coupon Meal', quantity: 1 }],
     status: 'Ready',
     createdAt: new Date(Date.now() - 15 * 60 * 1000),
   },
-  {
-    id: 'ORD-006',
+    {
+    id: 'CPN-104',
     studentId: 'student-007',
-    items: [{ name: 'Smoothie', quantity: 1 }],
+    items: [{ name: 'Coupon Meal', quantity: 1 }],
     status: 'Completed',
     createdAt: new Date(Date.now() - 60 * 60 * 1000),
   },
@@ -53,8 +40,10 @@ const initialOrders: Order[] = [
 
 interface OrderContextType {
   orders: Order[];
+  addOrder: (couponId: string) => void;
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
   getOrdersByStudent: (studentId: string) => Order[];
+  getOrdersByStatus: (status: OrderStatus) => Order[];
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -63,21 +52,39 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const { toast } = useToast();
 
+  const addOrder = useCallback((couponId: string) => {
+    // For simplicity, we assign a random student ID. In a real app, this would be linked to the coupon.
+    const studentId = `student-${Math.floor(Math.random() * 1000)}`;
+    const newOrder: Order = {
+      id: couponId,
+      studentId: studentId,
+      items: [{ name: 'Coupon Meal', quantity: 1 }],
+      status: 'Preparing',
+      createdAt: new Date(),
+    };
+
+    setOrders(prevOrders => {
+      // Prevent duplicate coupon entries
+      if (prevOrders.some(o => o.id === couponId)) {
+        toast({
+          title: "Coupon Already Exists",
+          description: `Coupon ${couponId} is already in the system.`,
+          variant: "destructive"
+        })
+        return prevOrders;
+      }
+      return [newOrder, ...prevOrders]
+    });
+  }, [toast]);
+
   const updateOrderStatus = useCallback((orderId: string, newStatus: OrderStatus) => {
     setOrders(prevOrders =>
       prevOrders.map(order => {
         if (order.id === orderId) {
-          console.log(`Updating order ${orderId} for student ${order.studentId} to ${newStatus}`);
           if (newStatus === 'Ready') {
-            // This is a placeholder for a real notification system.
-            // In a real app, this would trigger a push notification.
-            // We pass the studentId to the toast for potential use in the notification.
             toast({
               title: "Order Ready!",
-              description: `Your order ${orderId} is now ready for pickup.`,
-              action: (
-                <div data-student-id={order.studentId}></div>
-              )
+              description: `Order ${orderId} is now ready for pickup.`,
             })
           }
           return { ...order, status: newStatus };
@@ -91,11 +98,17 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     return orders.filter(order => order.studentId === studentId);
   }, [orders]);
 
+  const getOrdersByStatus = useCallback((status: OrderStatus) => {
+    return orders.filter(order => order.status === status);
+  }, [orders]);
+
 
   const value = {
     orders,
+    addOrder,
     updateOrderStatus,
     getOrdersByStudent,
+    getOrdersByStatus,
   };
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
