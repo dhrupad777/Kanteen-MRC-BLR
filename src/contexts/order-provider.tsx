@@ -77,19 +77,15 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       });
 
       const previousOrders = previousOrdersRef.current;
-      const newlyReadyOrderIds: string[] = [];
       
       ordersData.forEach(newOrder => {
         const oldOrder = previousOrders.find(o => o.id === newOrder.id);
         if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing' && notificationSubscriptionsRef.current.includes(newOrder.id)) {
           sendReadyNotification(newOrder);
-          newlyReadyOrderIds.push(newOrder.id);
+          // We can remove the subscription now that the notification has been sent.
+          setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
         }
       });
-
-      if (newlyReadyOrderIds.length > 0) {
-        setNotificationSubscriptions(prev => prev.filter(id => !newlyReadyOrderIds.includes(id)));
-      }
       
       setOrders(ordersData);
 

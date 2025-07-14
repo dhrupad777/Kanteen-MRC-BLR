@@ -45,7 +45,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
 
   return (
     <Card className={cn(
-        "flex flex-col w-full relative",
+        "flex flex-col w-full relative transition-all duration-300",
         {
           "overflow-hidden border-0": role === 'student',
           "flex-row items-center p-0": role === 'staff',
@@ -68,7 +68,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
         "p-0 flex-shrink-0": role === 'staff'
       })}>
         <div className={cn(
-            "rounded-lg p-2 w-full font-bold tracking-wider",
+            "rounded-lg p-2 w-full font-bold tracking-wider transition-colors duration-300",
             role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2',
             {
               'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing' && !isSubscribed,
