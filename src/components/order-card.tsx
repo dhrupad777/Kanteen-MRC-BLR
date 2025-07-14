@@ -59,8 +59,8 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
             "rounded-lg p-2 w-full font-bold tracking-wider",
             role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2',
             {
-              'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': !isSubscribed,
-              'bg-blue-800 dark:bg-blue-700 text-white': isSubscribed,
+              'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing' && !isSubscribed,
+              'bg-blue-800 dark:bg-blue-700 text-white': order.status === 'Preparing' && isSubscribed,
               'bg-green-200/90 dark:bg-green-900/50 text-green-900 dark:text-green-200': order.status === 'Ready',
             }
           )}>
