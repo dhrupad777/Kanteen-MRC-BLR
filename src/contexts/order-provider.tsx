@@ -24,6 +24,7 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const prevOrdersRef = useRef<Order[]>([]);
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const { toast } = useToast();
   
@@ -76,21 +77,21 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         });
 
         // This is the crucial part: compare old orders with new ones
-        setOrders(prevOrders => {
-            newOrders.forEach(newOrder => {
-                const oldOrder = prevOrders.find(o => o.id === newOrder.id);
-                // If status changed from 'Preparing' to 'Ready'
-                if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
-                    // And if we are subscribed to this order
-                    if (subscriptionsRef.current.includes(newOrder.id)) {
-                        sendReadyNotification(newOrder);
-                        // Clean up subscription after notification
-                        setNotificationSubscriptions(subs => subs.filter(id => id !== newOrder.id));
-                    }
+        newOrders.forEach(newOrder => {
+            const oldOrder = prevOrdersRef.current.find(o => o.id === newOrder.id);
+            // If status changed from 'Preparing' to 'Ready'
+            if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
+                // And if we are subscribed to this order
+                if (subscriptionsRef.current.includes(newOrder.id)) {
+                    sendReadyNotification(newOrder);
+                    // Clean up subscription after notification
+                    setNotificationSubscriptions(subs => subs.filter(id => id !== newOrder.id));
                 }
-            });
-            return newOrders; // Set the new state
+            }
         });
+        
+        setOrders(newOrders);
+        prevOrdersRef.current = newOrders;
 
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
