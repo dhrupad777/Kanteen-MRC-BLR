@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import React, { createContext, useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import type { UserProfile } from "@/types";
 
 interface AuthContextType {
@@ -61,12 +61,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const user = userCredential.user;
     
     const userRef = doc(db, "users", user.uid);
+    const isCustomer = profileData.name && profileData.phone;
     const dataToSet: UserProfile = {
       uid: user.uid,
       name: profileData.name || '',
       email: user.email || '',
-      phone: profileData.phone || '', // Keep phone if provided, otherwise empty
-      role: profileData.name && profileData.phone ? 'customer' : 'manager',
+      phone: profileData.phone || '',
+      role: isCustomer ? 'customer' : 'manager',
+      subscriptions: isCustomer ? [] : undefined,
     };
     await setDoc(userRef, dataToSet);
 

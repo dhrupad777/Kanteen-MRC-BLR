@@ -6,7 +6,8 @@ import React, { createContext, useCallback, useContext, useState, useEffect, use
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { useAuth } from "@/hooks/use-auth";
 
 interface OrderContextType {
   orders: Order[];
@@ -23,15 +24,18 @@ interface OrderContextType {
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
+  const { user, userProfile } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const prevOrdersRef = useRef<Order[]>([]);
-  const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
-  const { toast } = useToast();
   
+  const notificationSubscriptions = userProfile?.subscriptions ?? [];
   const subscriptionsRef = useRef(notificationSubscriptions);
+
   useEffect(() => {
     subscriptionsRef.current = notificationSubscriptions;
   }, [notificationSubscriptions]);
+
+  const { toast } = useToast();
 
   const sendReadyNotification = useCallback((order: Order) => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -45,19 +49,25 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleNotificationSubscription = useCallback((orderId: string) => {
-    setTimeout(() => {
-      setNotificationSubscriptions(prevSubs => {
-          const isSubscribed = prevSubs.includes(orderId);
-          if (isSubscribed) {
-              toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-              return prevSubs.filter(id => id !== orderId);
-          } else {
-              toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-              return [...prevSubs, orderId];
-          }
-      });
-    }, 0);
-  }, [toast]);
+    if (!user) return;
+    
+    const userRef = doc(db, "users", user.uid);
+    const isSubscribed = subscriptionsRef.current.includes(orderId);
+
+    updateDoc(userRef, {
+      subscriptions: isSubscribed ? arrayRemove(orderId) : arrayUnion(orderId)
+    }).then(() => {
+       if (isSubscribed) {
+          toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
+       } else {
+           toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
+       }
+    }).catch(error => {
+        console.error("Error updating subscriptions: ", error);
+        toast({ title: "Error", description: "Could not update your notification preferences.", variant: "destructive" });
+    });
+
+  }, [user, toast]);
 
 
   useEffect(() => {
@@ -80,7 +90,12 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
                 if (subscriptionsRef.current.includes(newOrder.id)) {
                     sendReadyNotification(newOrder);
-                    setNotificationSubscriptions(subs => subs.filter(id => id !== newOrder.id));
+                    if (user) {
+                      const userRef = doc(db, "users", user.uid);
+                      updateDoc(userRef, {
+                        subscriptions: arrayRemove(newOrder.id)
+                      });
+                    }
                 }
             }
         });
@@ -98,7 +113,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification]);
+  }, [toast, sendReadyNotification, user]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
