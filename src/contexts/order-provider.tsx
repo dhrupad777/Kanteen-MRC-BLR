@@ -27,7 +27,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const { toast } = useToast();
   
-  // Use a ref to store subscriptions to avoid stale closures in callbacks
   const subscriptionsRef = useRef(notificationSubscriptions);
   useEffect(() => {
     subscriptionsRef.current = notificationSubscriptions;
@@ -47,23 +46,27 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const toggleNotificationSubscription = useCallback((orderId: string) => {
     setNotificationSubscriptions(prevSubs => {
         const isSubscribed = prevSubs.includes(orderId);
-        if(isSubscribed) {
-            toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-            return prevSubs.filter(id => id !== orderId);
-        } else {
+        const newSubs = isSubscribed
+            ? prevSubs.filter(id => id !== orderId)
+            : [...prevSubs, orderId];
+
+        if (!isSubscribed) {
             toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-            return [...prevSubs, orderId];
+        } else {
+             toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
         }
+        
+        return newSubs;
     });
   }, [toast]);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-        const currentOrders: Order[] = [];
+        const newOrders: Order[] = [];
         snapshot.forEach((doc) => {
             const data = doc.data();
-            currentOrders.push({
+            newOrders.push({
                 id: doc.id,
                 studentId: data.studentId,
                 items: data.items,
@@ -72,28 +75,22 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             });
         });
 
-        // Use snapshot.docChanges to find what's new
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === "modified") {
-                const newOrderData = change.doc.data();
-                const newOrder = {
-                    id: change.doc.id,
-                    ...newOrderData
-                } as Order;
-
-                const oldOrder = orders.find(o => o.id === newOrder.id);
-                
-                if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
+        // This is the crucial part: compare old orders with new ones
+        setOrders(prevOrders => {
+            newOrders.forEach(newOrder => {
+                const oldOrder = prevOrders.find(o => o.id === newOrder.id);
+                // If status changed from 'Preparing' to 'Ready'
+                if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
+                    // And if we are subscribed to this order
                     if (subscriptionsRef.current.includes(newOrder.id)) {
                         sendReadyNotification(newOrder);
-                        // Remove from subscriptions after notifying
+                        // Clean up subscription after notification
                         setNotificationSubscriptions(subs => subs.filter(id => id !== newOrder.id));
                     }
                 }
-            }
+            });
+            return newOrders; // Set the new state
         });
-        
-        setOrders(currentOrders);
 
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
