@@ -8,12 +8,6 @@ import { Button } from "./ui/button"
 export function KanteenHeader() {
   const pathname = usePathname();
 
-  const navLinks = [
-    { href: "/", label: "Home", icon: <Home className="w-4 h-4" /> },
-    { href: "/student", label: "Customer", icon: <User className="w-4 h-4" /> },
-    { href: "/staff", label: "Manager", icon: <UtensilsCrossed className="w-4 h-4" /> },
-  ]
-
   const isDashboard = pathname.startsWith('/student') || pathname.startsWith('/staff');
 
   return (
@@ -24,7 +18,7 @@ export function KanteenHeader() {
           <span className="font-headline text-2xl font-bold text-foreground">Kanteen</span>
         </Link>
         
-        {isDashboard ? (
+        {isDashboard && (
            <div className="flex-1 flex justify-end">
              <Button asChild variant="ghost">
                <Link href="/">
@@ -33,22 +27,6 @@ export function KanteenHeader() {
                </Link>
              </Button>
            </div>
-        ) : (
-          <nav className="flex items-center gap-6 text-sm font-medium">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "flex items-center gap-2 transition-colors hover:text-primary",
-                  pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                {link.icon}
-                <span>{link.label}</span>
-              </Link>
-            ))}
-          </nav>
         )}
 
       </div>

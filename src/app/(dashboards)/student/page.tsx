@@ -36,7 +36,7 @@ export default function StudentDashboardPage() {
 
       <DashboardSection 
         title="Ready to Collect" 
-        icon={<CupSoda className="w-6 h-6 text-green-500"/>} 
+        icon={<CupSoda className="w-6 h-6 text-accent"/>} 
         orders={readyOrders} 
         emptyMessage="No orders are ready for pickup yet. You'll be notified!" 
         isHighlighted
@@ -62,7 +62,7 @@ interface DashboardSectionProps {
 
 function DashboardSection({ title, icon, orders, emptyMessage, isHighlighted = false }: DashboardSectionProps) {
     return (
-        <Card className={isHighlighted ? "border-primary/80 border-2 shadow-lg" : "bg-secondary/40 border-0"}>
+        <Card className={isHighlighted ? "border-accent/80 border-2 shadow-lg" : "bg-secondary/40 border-0"}>
             <CardHeader>
                 <CardTitle className="font-headline text-2xl font-bold flex items-center gap-3">
                     {icon}

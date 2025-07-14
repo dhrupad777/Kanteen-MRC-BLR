@@ -11,7 +11,7 @@ export default function StaffDashboardPage() {
 
   const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode }[] = [
     { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-primary" /> },
-    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-500" /> },
+    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-accent" /> },
   ];
 
   return (

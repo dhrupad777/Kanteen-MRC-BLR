@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -14,6 +13,8 @@ import { Ticket, PlusCircle } from 'lucide-react';
 const formSchema = z.object({
   couponId: z.coerce
     .number({invalid_type_error: "Please enter a valid number."})
+    .int()
+    .positive("Coupon number must be a positive number.")
     .min(1, 'Coupon number must be at least 1.')
     .max(200, 'Coupon number must be no more than 200.'),
 });
@@ -52,7 +53,7 @@ export function CouponEntryForm() {
                 <FormItem className="flex-grow">
                   <FormLabel>Coupon Number</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g. 42" {...field} value={field.value ?? ''} className="bg-background"/>
+                    <Input type="number" min="1" max="200" placeholder="e.g. 42" {...field} value={field.value ?? ''} className="bg-background"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
