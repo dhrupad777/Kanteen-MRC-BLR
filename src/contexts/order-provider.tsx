@@ -75,12 +75,15 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         // Use snapshot.docChanges to find what's new
         snapshot.docChanges().forEach((change) => {
             if (change.type === "modified") {
-                const newOrder = change.doc.data() as Order;
-                newOrder.id = change.doc.id;
-                const oldStatus = orders.find(o => o.id === newOrder.id)?.status;
+                const newOrderData = change.doc.data();
+                const newOrder = {
+                    id: change.doc.id,
+                    ...newOrderData
+                } as Order;
+
+                const oldOrder = orders.find(o => o.id === newOrder.id);
                 
-                // Check if the order just became ready and is in the subscription list
-                if (newOrder.status === 'Ready' && oldStatus === 'Preparing') {
+                if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
                     if (subscriptionsRef.current.includes(newOrder.id)) {
                         sendReadyNotification(newOrder);
                         // Remove from subscriptions after notifying
@@ -102,7 +105,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification, orders]);
+  }, [toast, sendReadyNotification]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
