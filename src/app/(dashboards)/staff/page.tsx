@@ -56,8 +56,8 @@ export default function StaffDashboardPage() {
   };
 
   const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode, className: string }[] = [
-    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "bg-sky-100 dark:bg-sky-900/30" },
-    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "bg-green-100 dark:bg-green-900/30" },
+    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "bg-sky-100/60 dark:bg-sky-900/30" },
+    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "bg-green-100/60 dark:bg-green-900/30" },
   ];
 
   if (loading || !user) {
@@ -104,13 +104,13 @@ export default function StaffDashboardPage() {
                         <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
                           {order.status === 'Preparing' && (
                             <>
-                              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEditClick(order)}>
+                              <Button variant="outline" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110" onClick={() => handleEditClick(order)}>
                                 <Edit className="h-4 w-4" />
                                 <span className="sr-only">Edit</span>
                               </Button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <Button variant="destructive" size="icon" className="h-8 w-8">
+                                  <Button variant="destructive" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110">
                                     <Trash2 className="h-4 w-4" />
                                      <span className="sr-only">Delete</span>
                                   </Button>
@@ -133,7 +133,7 @@ export default function StaffDashboardPage() {
                             </>
                           )}
                           {order.status === 'Ready' && (
-                             <Button variant="outline" size="sm" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
+                             <Button variant="outline" size="sm" className="transition-transform duration-200 ease-in-out hover:scale-105" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
                                 <Undo2 className="mr-1 h-3 w-3" /> Back
                               </Button>
                           )}

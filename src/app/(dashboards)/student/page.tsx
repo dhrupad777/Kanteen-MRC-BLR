@@ -42,7 +42,7 @@ export default function StudentDashboardPage() {
         icon={<CupSoda className="w-6 h-6 text-green-800"/>} 
         orders={readyOrders} 
         emptyMessage="No orders are ready for pickup yet. You'll be notified!" 
-        className="bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700/50"
+        className="bg-green-100/60 dark:bg-green-900/30 border-green-300/20 dark:border-green-700/50"
       />
       
       <DashboardSection 
@@ -50,7 +50,7 @@ export default function StudentDashboardPage() {
         icon={<CookingPot className="w-6 h-6 text-blue-800"/>} 
         orders={preparingOrders} 
         emptyMessage="You have no orders being prepared." 
-        className="bg-sky-100 dark:bg-sky-900/30 border-sky-300 dark:border-sky-700/50"
+        className="bg-sky-100/60 dark:bg-sky-900/30 border-sky-300/20 dark:border-sky-700/50"
       />
     </div>
   );
@@ -66,7 +66,7 @@ interface DashboardSectionProps {
 
 function DashboardSection({ title, icon, orders, emptyMessage, className }: DashboardSectionProps) {
     return (
-        <Card className={cn("border-2 shadow-lg", className)}>
+        <Card className={cn("border shadow-sm", className)}>
             <CardHeader>
                 <CardTitle className="font-headline text-2xl font-bold flex items-center gap-3 text-foreground/80">
                     {icon}

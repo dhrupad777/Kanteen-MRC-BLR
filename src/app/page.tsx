@@ -53,10 +53,10 @@ interface RoleCardProps {
 function RoleCard({ href, icon, title, description }: RoleCardProps) {
   return (
     <Link href={href} className="group block">
-      <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm p-4">
+      <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm p-4">
         <CardHeader className="flex flex-col items-center text-center">
-          <div className="p-4 bg-primary/10 rounded-full mb-4 transition-colors duration-300 group-hover:bg-primary/20">{icon}</div>
-          <CardTitle className="font-headline text-3xl">{title}</CardTitle>
+          <div className="p-4 bg-primary/10 rounded-full mb-4 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">{icon}</div>
+          <CardTitle className="font-headline text-3xl transition-colors group-hover:text-primary">{title}</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-muted-foreground mb-6 h-12">{description}</p>
@@ -65,4 +65,3 @@ function RoleCard({ href, icon, title, description }: RoleCardProps) {
     </Link>
   );
 }
-
