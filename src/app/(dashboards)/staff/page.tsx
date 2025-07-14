@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order, OrderStatus } from '@/types';
-import { ChefHat, CookingPot } from 'lucide-react';
+import { ChefHat, CookingPot, CheckCircle } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 import { cn } from '@/lib/utils';
 import {
@@ -65,7 +65,7 @@ export default function StaffDashboardPage() {
                     {column.icon}
                     {column.title} ({columnOrders.length})
                   </h2>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                   {columnOrders.length > 0 ? (
                       columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
                       <div key={order.id} className="space-y-2">
