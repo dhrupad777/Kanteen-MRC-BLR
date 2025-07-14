@@ -5,13 +5,14 @@ import { OrderCard } from '@/components/order-card';
 import { OrderStatus } from '@/types';
 import { ChefHat, CookingPot, CheckCircle } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
+import { cn } from '@/lib/utils';
 
 export default function StaffDashboardPage() {
   const { orders, updateOrderStatus } = useOrders();
 
-  const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode }[] = [
-    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-primary" /> },
-    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-accent" /> },
+  const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode, className: string }[] = [
+    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "bg-sky-100 dark:bg-sky-900/30" },
+    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "bg-green-100 dark:bg-green-900/30" },
   ];
 
   return (
@@ -28,8 +29,8 @@ export default function StaffDashboardPage() {
           {orderColumns.map(column => {
               const columnOrders = orders.filter(o => o.status === column.status);
               return (
-              <div key={column.title} className="space-y-4 p-4 bg-secondary/40 rounded-xl h-full">
-                  <h2 className="font-headline text-xl font-semibold flex items-center px-2">
+              <div key={column.title} className={cn("space-y-4 p-4 rounded-xl h-full", column.className)}>
+                  <h2 className="font-headline text-xl font-semibold flex items-center px-2 text-foreground/80">
                     {column.icon}
                     {column.title} ({columnOrders.length})
                   </h2>

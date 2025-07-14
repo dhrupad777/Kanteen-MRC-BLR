@@ -37,8 +37,8 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
         </div>
       </CardContent>
       {role === 'staff' && nextStatus && (
-        <CardFooter className="p-3">
-          <Button onClick={handleStatusUpdate} className="w-full bg-primary hover:bg-accent transition-colors font-semibold">
+        <CardFooter className="p-2">
+          <Button onClick={handleStatusUpdate} className="w-full bg-primary hover:bg-primary/80 transition-colors font-semibold">
             {nextStatus === "Ready" ? <ArrowRight className="mr-2 h-4 w-4" /> : <Check className="mr-2 h-4 w-4" />}
             <span>Mark as {nextStatus}</span>
           </Button>

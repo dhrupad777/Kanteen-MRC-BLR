@@ -6,6 +6,7 @@ import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CupSoda, CookingPot } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function StudentDashboardPage() {
   const { orders } = useOrders();
@@ -36,17 +37,18 @@ export default function StudentDashboardPage() {
 
       <DashboardSection 
         title="Ready to Collect" 
-        icon={<CupSoda className="w-6 h-6 text-accent"/>} 
+        icon={<CupSoda className="w-6 h-6 text-green-800"/>} 
         orders={readyOrders} 
         emptyMessage="No orders are ready for pickup yet. You'll be notified!" 
-        isHighlighted
+        className="bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700/50"
       />
       
       <DashboardSection 
         title="Currently Preparing" 
-        icon={<CookingPot className="w-6 h-6 text-primary"/>} 
+        icon={<CookingPot className="w-6 h-6 text-blue-800"/>} 
         orders={preparingOrders} 
         emptyMessage="You have no orders being prepared." 
+        className="bg-sky-100 dark:bg-sky-900/30 border-sky-300 dark:border-sky-700/50"
       />
     </div>
   );
@@ -57,14 +59,14 @@ interface DashboardSectionProps {
     icon: React.ReactNode;
     orders: Order[];
     emptyMessage: string;
-    isHighlighted?: boolean;
+    className?: string;
 }
 
-function DashboardSection({ title, icon, orders, emptyMessage, isHighlighted = false }: DashboardSectionProps) {
+function DashboardSection({ title, icon, orders, emptyMessage, className }: DashboardSectionProps) {
     return (
-        <Card className={isHighlighted ? "border-accent/80 border-2 shadow-lg" : "bg-secondary/40 border-0"}>
+        <Card className={cn("border-2 shadow-lg", className)}>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl font-bold flex items-center gap-3">
+                <CardTitle className="font-headline text-2xl font-bold flex items-center gap-3 text-foreground/80">
                     {icon}
                     <span>{title} ({orders.length})</span>
                 </CardTitle>
