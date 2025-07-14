@@ -18,115 +18,78 @@ export const KanteenMascot = ({ state = "default", className, ...props }: Kantee
     >
       <defs>
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="rgba(0,0,0,0.1)" />
+          <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="rgba(0,0,0,0.15)" />
         </filter>
       </defs>
       
       <g filter="url(#shadow)">
-        {/* Lid Handle */}
-        <path
-          d="M45 28 C45 23, 55 23, 55 28 L 55 32 L 45 32 Z"
-          className={cn(
-            "stroke-slate-600 stroke-2 transition-colors duration-300",
-            isPreparing && "fill-blue-600",
-            isReady && "fill-green-600",
-            state === "default" && "fill-slate-500"
-          )}
-        />
-        {/* Lid */}
-        <path
-          d="M20 50 C 20 30, 80 30, 80 50 Z"
-          className={cn(
-            "stroke-slate-500 stroke-[3] transition-colors duration-300",
-             isPreparing && "fill-blue-500",
-            isReady && "fill-green-500",
-            state === "default" && "fill-slate-400"
-          )}
-        />
-        
         {/* Body */}
-        <path
-          d="M20 50 H 80 V 90 C 80 95, 75 95, 70 95 H 30 C 25 95, 20 95, 20 90 Z"
+        <path 
+          d="M30 95 C 25 70, 25 50, 35 45 L 65 45 C 75 50, 75 70, 70 95 Z"
           className={cn(
-            "stroke-slate-500 stroke-[3] transition-colors duration-300",
+            "stroke-black/50 stroke-2",
             isPreparing && "fill-blue-200",
             isReady && "fill-green-200",
-            state === "default" && "fill-slate-200"
+            state === "default" && "fill-slate-100"
           )}
         />
-        
-        {/* Shirt */}
-         <path
-          d="M22 55 H 78 V 75 H 22 Z"
+        {/* Apron */}
+         <path 
+          d="M40 55 H 60 V 80 H 40 Z"
           className={cn(
-            "transition-colors duration-300",
+            "stroke-black/50 stroke-1",
             isPreparing && "fill-blue-400",
             isReady && "fill-green-400",
             state === "default" && "fill-orange-400"
           )}
         />
-        <path
-          d="M30 55 V 75"
-           className={cn(
-            "transition-colors duration-300 stroke-black/20 stroke-2",
-          )}
-        />
-         <path
-          d="M70 55 V 75"
-           className={cn(
-            "transition-colors duration-300 stroke-black/20 stroke-2",
-          )}
-        />
 
-
+        {/* Head */}
+        <circle cx="50" cy="35" r="18" fill="#FDEBD0" stroke="#000" strokeWidth="1.5" />
+        
+        {/* Chef Hat */}
+        <path d="M30 25 H 70 V 20 H 30 Z" fill="white" stroke="black" strokeWidth="1.5"/>
+        <path d="M30 20 Q 20 10, 40 10 C 50 5, 60 5, 70 10 Q 80 10, 70 20 Z" fill="white" stroke="black" strokeWidth="1.5"/>
+        
         {/* Face */}
-        <g className="transition-transform duration-300">
+        <g>
           {/* Eyes */}
-          <circle cx="40" cy="65" r="4" fill="white" stroke="black" strokeWidth="1.5"/>
-          <circle cx="39" cy="64" r="1.5" fill="black" />
-          <circle cx="60" cy="65" r="4" fill="white" stroke="black" strokeWidth="1.5"/>
-          <circle cx="59" cy="64" r="1.5" fill="black" />
+          <circle cx="42" cy="35" r="2.5" fill="white" stroke="black" strokeWidth="1"/>
+          <circle cx="41.5" cy="34.5" r="1" fill="black" />
+          <circle cx="58" cy="35" r="2.5" fill="white" stroke="black" strokeWidth="1"/>
+          <circle cx="57.5" cy="34.5" r="1" fill="black" />
           
           {/* Mouth */}
           <path
-            d={isReady ? "M45 75 Q50 82, 55 75" : "M45 75 Q50 72, 55 75"}
+            d={isReady ? "M45 45 Q50 50, 55 45" : "M45 45 Q50 43, 55 45"}
             stroke="black"
-            strokeWidth="2"
+            strokeWidth="1.5"
             fill="none"
             className="transition-all duration-300"
           />
-        </g>
 
+          {/* Mustache */}
+          <path d="M40 42 C 45 38, 55 38, 60 42 C 55 42, 45 42, 40 42 Z" fill="#6D4C41" stroke="black" strokeWidth="1"/>
+        </g>
+        
         {/* Arms and Props */}
         {isPreparing && (
            <g className="transition-opacity duration-300 opacity-100 arm-group">
             {/* Left Arm */}
-            <path d="M22 65 C 10 60, 10 75, 22 70"  
-              className={cn("stroke-[3] transition-colors duration-300", isPreparing && "stroke-blue-500")}
-              fill={cn(isPreparing && "fill-blue-200")} 
-            />
+            <path d="M35 60 C 20 55, 15 75, 30 70" fill="#FDEBD0" stroke="black" strokeWidth="1.5" />
             {/* Right Arm with Clock */}
-            <path d="M78 65 C 95 60, 95 40, 78 45"
-              className={cn("stroke-[3] transition-colors duration-300", isPreparing && "stroke-blue-500")}
-              fill={cn(isPreparing && "fill-blue-200")} 
-             />
-            <circle cx="88" cy="35" r="8" fill="white" stroke="black" strokeWidth="1.5" />
-            <line x1="88" y1="35" x2="88" y2="30" stroke="black" strokeWidth="1" />
-            <line x1="88" y1="35" x2="92" y2="37" stroke="black" strokeWidth="1" />
+            <path d="M65 60 C 85 55, 90 30, 75 40" fill="#FDEBD0" stroke="black" strokeWidth="1.5" />
+            <circle cx="85" cy="28" r="8" fill="white" stroke="black" strokeWidth="1.5" />
+            <line x1="85" y1="28" x2="85" y2="23" stroke="black" strokeWidth="1" />
+            <line x1="85" y1="28" x2="89" y2="30" stroke="black" strokeWidth="1" />
           </g>
         )}
         {isReady && (
             <g className="transition-opacity duration-300 opacity-100 arm-group">
-              {/* Left Arm */}
-              <path d="M22 65 C 10 55, 15 85, 22 75"
-                className={cn("stroke-[3] transition-colors duration-300", isReady && "stroke-green-500")}
-                fill={cn(isReady && "fill-green-200")} 
-              />
+              {/* Left Arm Thumbs Up */}
+               <path d="M35 60 C 25 55, 20 70, 30 70 L 28 65 L 25 67 L 25 75 L 35 75 C 40 75, 40 70, 35 70" fill="#FDEBD0" stroke="black" strokeWidth="1.5"/>
               {/* Right Arm */}
-              <path d="M78 65 C 90 55, 85 85, 78 75"
-                className={cn("stroke-[3] transition-colors duration-300", isReady && "stroke-green-500")}
-                fill={cn(isReady && "fill-green-200")} 
-              />
+              <path d="M65 60 C 75 55, 80 75, 70 70" fill="#FDEBD0" stroke="black" strokeWidth="1.5"/>
             </g>
         )}
       </g>
