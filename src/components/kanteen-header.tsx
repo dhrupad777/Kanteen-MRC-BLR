@@ -1,51 +1,33 @@
 
 "use client"
 import Link from "next/link"
-import { ChefHat, LogOut } from "lucide-react"
+import { ChefHat, LogOut, User } from "lucide-react"
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from "./ui/button"
 import { useAuth } from "@/hooks/use-auth"
-import { useEffect, useState } from "react"
 
 export function KanteenHeader() {
   const pathname = usePathname();
-  const { user, signOutUser } = useAuth();
+  const { user, userProfile, signOutUser } = useAuth();
   const router = useRouter();
-  const [customerName, setCustomerName] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (pathname.startsWith('/student')) {
-      try {
-        const storedInfo = localStorage.getItem('kanteenCustomer');
-        if (storedInfo) {
-          const info = JSON.parse(storedInfo);
-          setCustomerName(info.name);
-        } else {
-            setCustomerName(null);
-        }
-      } catch (e) {
-        setCustomerName(null);
-      }
-    }
-  }, [pathname]);
-
-  const handleManagerSignOut = async () => {
+  const handleSignOut = async () => {
     await signOutUser();
-    router.push('/login');
-  }
-
-  const handleCustomerSignOut = () => {
-    localStorage.removeItem('kanteenCustomer');
-    setCustomerName(null);
-    router.push('/student');
+    // Redirect to the appropriate login page based on where they logged out from
+    if (pathname.startsWith('/staff')) {
+        router.push('/login');
+    } else {
+        router.push('/student-login');
+    }
   }
   
-  const getFirstName = (name: string | null) => {
+  const getFirstName = (name: string | null | undefined) => {
     if (!name) return '';
     return name.split(' ')[0];
   }
 
-  const isStudentPage = pathname.startsWith('/student');
+  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/student-login' || pathname === '/student-signup';
+  const showAuthButton = !user && !isAuthPage;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
@@ -56,29 +38,28 @@ export function KanteenHeader() {
         </Link>
         
         <div className="flex items-center justify-end gap-4">
-           {isStudentPage && customerName && (
-            <span className="text-sm font-medium text-foreground/80 hidden sm:block">
-              Hello, {getFirstName(customerName)}!
-            </span>
+           {user && userProfile && (
+            <>
+                <span className="text-sm font-medium text-foreground/80 hidden sm:block">
+                  Hello, {getFirstName(userProfile.name)}!
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+            </>
           )}
 
-          {user && (
-            <Button variant="ghost" size="sm" onClick={handleManagerSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          )}
-
-          {isStudentPage && customerName && (
-             <Button variant="ghost" size="sm" onClick={handleCustomerSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+           {showAuthButton && (
+             <Button asChild variant="ghost" size="sm">
+                <Link href="/student-login">
+                    <User className="mr-2 h-4 w-4" />
+                    Customer Login
+                </Link>
+             </Button>
           )}
         </div>
       </div>
     </header>
   )
 }
-
-    

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
-import { db, auth } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -25,7 +25,7 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const prevOrdersRef = useRef<Order[]>([]);
-  const { user, userProfile } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
