@@ -13,7 +13,7 @@ import { Ticket } from 'lucide-react';
 
 const formSchema = z.object({
   couponId: z.coerce
-    .number()
+    .number({invalid_type_error: "Please enter a valid number."})
     .min(1, 'Coupon number must be at least 1.')
     .max(200, 'Coupon number must be no more than 200.'),
 });
@@ -30,7 +30,7 @@ export function CouponEntryForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     addOrder(values.couponId.toString());
-    form.reset();
+    form.reset({couponId: undefined});
   }
 
   return (
@@ -52,7 +52,7 @@ export function CouponEntryForm() {
                 <FormItem className="flex-grow">
                   <FormLabel>Coupon Number</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g. 42" {...field} onChange={event => field.onChange(event.target.valueAsNumber)} />
+                    <Input type="number" placeholder="e.g. 42" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

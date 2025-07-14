@@ -1,8 +1,9 @@
 "use client"
 import Link from "next/link"
-import { Utensils, Home, User, UtensilsCrossed } from "lucide-react"
+import { Utensils, Home, User, UtensilsCrossed, LogOut } from "lucide-react"
 import { usePathname } from 'next/navigation'
 import { cn } from "@/lib/utils"
+import { Button } from "./ui/button"
 
 export function KanteenHeader() {
   const pathname = usePathname();
@@ -13,6 +14,8 @@ export function KanteenHeader() {
     { href: "/staff", label: "Manager", icon: <UtensilsCrossed className="w-4 h-4" /> },
   ]
 
+  const isDashboard = pathname.startsWith('/student') || pathname.startsWith('/staff');
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -20,21 +23,34 @@ export function KanteenHeader() {
           <Utensils className="h-7 w-7 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">Kanteen</span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm font-medium">
-          {navLinks.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "flex items-center gap-2 transition-colors hover:text-primary",
-                pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? "text-primary" : "text-muted-foreground"
-              )}
-            >
-              {link.icon}
-              <span>{link.label}</span>
-            </Link>
-          ))}
-        </nav>
+        
+        {isDashboard ? (
+           <div className="flex-1 flex justify-end">
+             <Button asChild variant="ghost">
+               <Link href="/">
+                 <LogOut className="mr-2 h-4 w-4" />
+                 Switch Role
+               </Link>
+             </Button>
+           </div>
+        ) : (
+          <nav className="flex items-center gap-6 text-sm font-medium">
+            {navLinks.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "flex items-center gap-2 transition-colors hover:text-primary",
+                  pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? "text-primary" : "text-muted-foreground"
+                )}
+              >
+                {link.icon}
+                <span>{link.label}</span>
+              </Link>
+            ))}
+          </nav>
+        )}
+
       </div>
     </header>
   )
