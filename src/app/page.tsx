@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, User, UtensilsCrossed } from 'lucide-react';
+import { User, UtensilsCrossed } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KanteenHeader } from '@/components/kanteen-header';
@@ -49,17 +49,14 @@ interface RoleCardProps {
 
 function RoleCard({ href, icon, title, description }: RoleCardProps) {
   return (
-    <Link href={href} className="group">
-      <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm">
+    <Link href={href} className="group block">
+      <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm p-4">
         <CardHeader className="flex flex-col items-center text-center">
           <div className="p-4 bg-primary/10 rounded-full mb-4">{icon}</div>
           <CardTitle className="font-headline text-3xl">{title}</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-muted-foreground mb-6 h-12">{description}</p>
-          <Button variant="ghost" className="text-primary group-hover:text-accent font-semibold text-base">
-            Go to Dashboard <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-          </Button>
         </CardContent>
       </Card>
     </Link>

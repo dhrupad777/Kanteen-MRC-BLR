@@ -1,8 +1,7 @@
 "use client";
 
 import type { Order, OrderStatus } from "@/types";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { OrderStatusBadge } from "./order-status-badge";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { ArrowRight, Check } from "lucide-react";
 
@@ -31,13 +30,8 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
   const couponId = order.studentId.split('-')[1] || order.id;
 
   return (
-    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card">
-      <CardHeader>
-        <div className="flex justify-end items-start gap-4">
-          <OrderStatusBadge status={order.status} />
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow flex flex-col justify-center items-center text-center p-4">
+    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card overflow-hidden">
+      <CardContent className="flex-grow flex flex-col justify-center items-center text-center p-6">
         <div className="bg-muted/50 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 w-full">
             <p className="text-sm font-semibold text-muted-foreground tracking-widest">COUPON</p>
             <p className="font-headline font-bold text-5xl text-foreground tracking-tighter">{couponId}</p>
