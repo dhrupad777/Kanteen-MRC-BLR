@@ -68,18 +68,20 @@ export default function StaffDashboardPage() {
                   <div className="space-y-3">
                   {columnOrders.length > 0 ? (
                       columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
-                      <div key={order.id} className="space-y-2">
+                      <div key={order.id} className="flex items-center gap-2">
                         <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
-                        <div className="flex justify-center gap-2">
+                        <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
                           {order.status === 'Preparing' && (
                             <>
-                              <Button variant="outline" size="sm" onClick={() => handleEditClick(order)}>
-                                <Edit className="mr-1 h-3 w-3" /> Edit
+                              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEditClick(order)}>
+                                <Edit className="h-4 w-4" />
+                                <span className="sr-only">Edit</span>
                               </Button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <Button variant="destructive" size="sm">
-                                    <Trash2 className="mr-1 h-3 w-3" /> Delete
+                                  <Button variant="destructive" size="icon" className="h-8 w-8">
+                                    <Trash2 className="h-4 w-4" />
+                                     <span className="sr-only">Delete</span>
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -101,7 +103,7 @@ export default function StaffDashboardPage() {
                           )}
                           {order.status === 'Ready' && (
                              <Button variant="outline" size="sm" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
-                                <Undo2 className="mr-1 h-3 w-3" /> Back to Preparing
+                                <Undo2 className="mr-1 h-3 w-3" /> Back
                               </Button>
                           )}
                         </div>

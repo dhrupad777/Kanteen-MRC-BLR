@@ -34,24 +34,30 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
 
   return (
     <Card className={cn(
-        "flex flex-col h-full transition-all duration-300 bg-card overflow-hidden",
+        "flex flex-col transition-all duration-300 bg-card overflow-hidden w-full",
         {
           "hover:shadow-xl hover:-translate-y-1": role === 'student',
+          "max-w-xs": role === 'student',
+          "flex-row items-center p-2": role === 'staff',
         }
       )}>
-      <CardContent className="flex-grow flex flex-col justify-center items-center text-center p-3">
+      <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
+        "p-2": role === 'student',
+        "p-0 flex-shrink-0": role === 'staff'
+      })}>
         <div className={cn(
-            "rounded-lg p-3 w-full text-primary-foreground font-bold text-5xl tracking-tighter",
-            order.status === 'Preparing' && 'bg-blue-500',
-            order.status === 'Ready' && 'bg-green-500',
-            order.status !== 'Preparing' && order.status !== 'Ready' && 'bg-primary'
+            "rounded-md p-2 w-full font-bold tracking-tighter",
+            order.status === 'Preparing' && 'bg-blue-500 text-white',
+            order.status === 'Ready' && 'bg-green-500 text-white',
+            order.status !== 'Preparing' && order.status !== 'Ready' && 'bg-primary text-primary-foreground',
+            role === 'student' ? 'text-5xl' : 'text-xl px-4'
           )}>
-            <p>{couponId}</p>
+            <p className="tabular-nums">{couponId}</p>
         </div>
       </CardContent>
       {role === 'staff' && nextStatus && (
-        <CardFooter className="p-2 pt-0">
-          <Button onClick={handleStatusUpdate} size="sm" className="w-full bg-primary hover:bg-primary/90 transition-colors font-semibold">
+        <CardFooter className="p-0 pl-2 flex-grow">
+          <Button onClick={handleStatusUpdate} size="sm" className="w-full bg-primary hover:bg-primary/90 transition-colors font-semibold h-9">
             {nextStatus === "Ready" ? <ArrowRight className="mr-2 h-4 w-4" /> : <Check className="mr-2 h-4 w-4" />}
             <span>{buttonText}</span>
           </Button>
