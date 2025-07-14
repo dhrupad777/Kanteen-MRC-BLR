@@ -88,24 +88,6 @@ function DashboardSection({ title, icon, orders, emptyMessage, className }: Dash
                                 className="relative group"
                             >
                                 <OrderCard key={order.id} order={order} role="student" />
-                                <AnimatePresence>
-                                <motion.div
-                                    key="mascot"
-                                    initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                                    exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="absolute -right-4 -top-6 w-24 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                                >
-                                     <ChefHat className={cn(
-                                         "w-24 h-24 text-primary/20 transition-all duration-300",
-                                         order.status === 'Preparing' && 'text-blue-400',
-                                         order.status === 'Ready' && 'text-green-400'
-                                         )} 
-                                         strokeWidth={1}
-                                     />
-                                </motion.div>
-                                </AnimatePresence>
                             </motion.div>
                         ))}
                         </AnimatePresence>

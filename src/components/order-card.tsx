@@ -4,13 +4,14 @@
 import type { Order, OrderStatus } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "./ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OrderCardProps {
   order: Order;
   role: 'student' | 'staff';
   onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
+  onNotifyClick?: (order: Order) => void;
 }
 
 const statusProgression: Record<string, OrderStatus | null> = {
@@ -20,7 +21,7 @@ const statusProgression: Record<string, OrderStatus | null> = {
   Completed: null,
 };
 
-export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
+export function OrderCard({ order, role, onStatusChange, onNotifyClick }: OrderCardProps) {
   const nextStatus = statusProgression[order.status];
 
   const handleStatusUpdate = () => {
@@ -35,12 +36,23 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
 
   return (
     <Card className={cn(
-        "flex flex-col transition-all duration-300 w-full",
+        "flex flex-col transition-all duration-300 w-full relative",
         {
           "hover:shadow-xl hover:-translate-y-1 overflow-visible border-0 group/order": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         }
       )}>
+      {role === 'staff' && order.status === 'Preparing' && onNotifyClick && (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="absolute top-1 right-1 h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all rounded-full"
+          onClick={() => onNotifyClick(order)}
+        >
+          <Bell className="h-4 w-4" />
+          <span className="sr-only">Send Ready Notification</span>
+        </Button>
+      )}
       <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
         "p-0": role === 'student',
         "p-0 flex-shrink-0": role === 'staff'
@@ -49,7 +61,7 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
             "rounded-lg p-2 w-full font-bold tracking-wider",
             order.status === 'Preparing' && 'bg-blue-100/80 text-blue-900',
             order.status === 'Ready' && 'bg-green-100/80 text-green-900',
-            role === 'student' ? 'text-6xl p-6' : 'text-4xl px-4'
+            role === 'student' ? 'text-6xl p-6' : 'text-4xl px-4 font-mono tabular-nums'
           )}>
             <p className="tabular-nums font-mono">{couponId}</p>
         </div>

@@ -16,6 +16,7 @@ interface OrderContextType {
   updateOrderCoupon: (orderId: string, newCouponId: string) => void;
   getOrdersByStudent: (studentId: string) => Order[];
   getOrdersByStatus: (status: OrderStatus) => Order[];
+  sendReadyNotification: (order: Order) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -28,6 +29,27 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     previousOrdersRef.current = orders;
   }, [orders]);
+
+  const sendReadyNotification = useCallback((order: Order) => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('Kanteen Order Ready!', {
+          body: `Your order for coupon #${order.studentId.split('-')[1]} is ready for pickup.`,
+          icon: '/favicon.ico'
+        });
+        toast({
+          title: "Notification Sent",
+          description: `Customer with coupon #${order.studentId.split('-')[1]} has been notified.`,
+        });
+      } else {
+        toast({
+          title: "Notification Permission Denied",
+          description: "Cannot send notification. Please check browser permissions.",
+          variant: "destructive"
+        });
+      }
+    }
+  }, [toast]);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
@@ -49,12 +71,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       ordersData.forEach(newOrder => {
         const oldOrder = previousOrders.find(o => o.id === newOrder.id);
         if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
-          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-             new Notification('Kanteen Order Ready!', {
-              body: `Your order for coupon #${newOrder.studentId.split('-')[1]} is ready for pickup.`,
-              icon: '/favicon.ico'
-            });
-          }
+          sendReadyNotification(newOrder);
         }
       });
       
@@ -70,7 +87,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, [toast, sendReadyNotification]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
@@ -113,7 +130,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         title: "Order Removed",
         description: "The order has been successfully removed.",
       });
-    } catch (error) {
+    } catch (error)
+      {
       console.error("Error deleting document: ", error);
       toast({
         title: "Error",
@@ -134,13 +152,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         await updateDoc(orderRef, {
             status: newStatus
         });
-        const order = orders.find(o => o.id === orderId);
-        if (order && newStatus === 'Ready') {
-            toast({
-                title: "Order Ready!",
-                description: `Order for coupon #${order.studentId.split('-')[1]} is now ready for pickup.`,
-            });
-        }
+        
     } catch (error) {
          console.error("Error updating document: ", error);
         toast({
@@ -149,7 +161,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             variant: "destructive"
         })
     }
-  }, [orders, toast, deleteOrder]);
+  }, [toast, deleteOrder]);
 
   const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
     const activeOrder = orders.find(o => o.studentId === `student-${newCouponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
@@ -199,6 +211,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     updateOrderCoupon,
     getOrdersByStudent,
     getOrdersByStatus,
+    sendReadyNotification,
   };
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
