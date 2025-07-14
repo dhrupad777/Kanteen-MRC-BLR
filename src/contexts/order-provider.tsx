@@ -26,11 +26,12 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const { toast } = useToast();
-  const previousOrdersRef = useRef<Order[]>([]);
-
+  
+  // Use a ref to store subscriptions to avoid stale closures in callbacks
+  const subscriptionsRef = useRef(notificationSubscriptions);
   useEffect(() => {
-    previousOrdersRef.current = orders;
-  }, [orders]);
+    subscriptionsRef.current = notificationSubscriptions;
+  }, [notificationSubscriptions]);
 
   const sendReadyNotification = useCallback((order: Order) => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -58,38 +59,38 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const ordersData: Order[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        ordersData.push({
-          id: doc.id,
-          studentId: data.studentId,
-          items: data.items,
-          status: data.status,
-          createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate() : new Date(),
-        });
-      });
-
-      const previousOrders = previousOrdersRef.current;
-      
-      ordersData.forEach(newOrder => {
-        const oldOrder = previousOrders.find(o => o.id === newOrder.id);
-        // Check if the order just became ready and is in the subscription list
-        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
-            setNotificationSubscriptions(currentSubs => {
-                if (currentSubs.includes(newOrder.id)) {
-                    sendReadyNotification(newOrder);
-                    // Return a new array without the notified order ID
-                    return currentSubs.filter(id => id !== newOrder.id);
-                }
-                // Return the existing array if no notification was sent
-                return currentSubs;
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const currentOrders: Order[] = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            currentOrders.push({
+                id: doc.id,
+                studentId: data.studentId,
+                items: data.items,
+                status: data.status,
+                createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate() : new Date(),
             });
-        }
-      });
-      
-      setOrders(ordersData);
+        });
+
+        // Use snapshot.docChanges to find what's new
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "modified") {
+                const newOrder = change.doc.data() as Order;
+                newOrder.id = change.doc.id;
+                const oldStatus = orders.find(o => o.id === newOrder.id)?.status;
+                
+                // Check if the order just became ready and is in the subscription list
+                if (newOrder.status === 'Ready' && oldStatus === 'Preparing') {
+                    if (subscriptionsRef.current.includes(newOrder.id)) {
+                        sendReadyNotification(newOrder);
+                        // Remove from subscriptions after notifying
+                        setNotificationSubscriptions(subs => subs.filter(id => id !== newOrder.id));
+                    }
+                }
+            }
+        });
+        
+        setOrders(currentOrders);
 
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
@@ -101,7 +102,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification]);
+  }, [toast, sendReadyNotification, orders]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
