@@ -29,6 +29,12 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const previousOrdersRef = useRef<Order[]>([]);
   const lastToggledOrderRef = useRef<{ id: string; subscribed: boolean } | null>(null);
 
+  const notificationSubscriptionsRef = useRef(notificationSubscriptions);
+
+  useEffect(() => {
+    notificationSubscriptionsRef.current = notificationSubscriptions;
+  }, [notificationSubscriptions]);
+
   useEffect(() => {
     previousOrdersRef.current = orders;
   }, [orders]);
@@ -88,10 +94,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       
       ordersData.forEach(newOrder => {
         const oldOrder = previousOrders.find(o => o.id === newOrder.id);
-        // Check if the order status changed to 'Ready' and the user is subscribed
-        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing' && notificationSubscriptions.includes(newOrder.id)) {
+        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing' && notificationSubscriptionsRef.current.includes(newOrder.id)) {
           sendReadyNotification(newOrder);
-          // Unsubscribe after sending notification to prevent duplicates
           setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
         }
       });
@@ -108,7 +112,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification, notificationSubscriptions]);
+  }, [toast, sendReadyNotification]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
