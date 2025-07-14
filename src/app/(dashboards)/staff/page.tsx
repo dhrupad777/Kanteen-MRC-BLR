@@ -78,7 +78,7 @@ export default function StaffDashboardPage() {
       </div>
       <div className="space-y-8 pt-4">
         <CouponEntryForm />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           {orderColumns.map(column => {
             const columnOrders = orders.filter(o => o.status === column.status);
             return (
