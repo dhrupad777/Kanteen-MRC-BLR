@@ -13,6 +13,7 @@ interface OrderCardProps {
   onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
   showBell?: boolean;
   isSubscribed?: boolean;
+  onToggleSubscription?: (orderId: string) => void;
 }
 
 const statusProgression: Record<string, OrderStatus | null> = {
@@ -22,7 +23,7 @@ const statusProgression: Record<string, OrderStatus | null> = {
   Completed: null,
 };
 
-export function OrderCard({ order, role, onStatusChange, showBell = false, isSubscribed = false }: OrderCardProps) {
+export function OrderCard({ order, role, onStatusChange, showBell = false, isSubscribed = false, onToggleSubscription }: OrderCardProps) {
   const nextStatus = statusProgression[order.status];
   
   const couponId = order.studentId.split('-')[1] || order.id;
@@ -35,28 +36,39 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
     }
   };
 
+  const handleBellClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent any parent handlers from being executed
+    if (onToggleSubscription) {
+        onToggleSubscription(order.id);
+    }
+  };
+
   return (
     <Card className={cn(
-        "flex flex-col w-full relative",
+        "flex flex-col w-full relative transition-colors duration-300",
         {
           "overflow-hidden border-0": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         }
       )}>
        {role === 'student' && showBell && (
-        <div className="absolute top-2 right-2 z-10">
+        <button
+          onClick={handleBellClick}
+          className="absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-white/50"
+          aria-label={isSubscribed ? "Unsubscribe from notifications" : "Subscribe to notifications"}
+        >
             {isSubscribed 
               ? <BellRing className="h-5 w-5 text-white" /> 
-              : <Bell className="h-5 w-5 text-primary/70" />
+              : <Bell className="h-5 w-5 text-primary/80" />
             }
-        </div>
+        </button>
       )}
       <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
         "p-0": role === 'student',
         "p-0 flex-shrink-0": role === 'staff'
       })}>
         <div className={cn(
-            "rounded-lg p-2 w-full font-bold tracking-wider",
+            "rounded-lg p-2 w-full font-bold tracking-wider transition-colors duration-300",
             role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2',
             {
               'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing' && !isSubscribed,

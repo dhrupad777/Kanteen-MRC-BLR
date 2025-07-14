@@ -68,7 +68,7 @@ export default function StudentDashboardPage() {
     <div className="space-y-8">
        <div>
         <h1 className="font-headline text-3xl font-bold">Your Order Status</h1>
-        <p className="text-muted-foreground">Track the real-time status of your food order. Press and hold a preparing coupon for 0.7s to get notified when it's ready.</p>
+        <p className="text-muted-foreground">Track the real-time status of your food order. Click the bell on a preparing coupon to get notified when it's ready.</p>
       </div>
 
       <DashboardSection 
@@ -105,26 +105,6 @@ interface DashboardSectionProps {
 }
 
 function DashboardSection({ title, icon, orders, emptyMessage, className, isPreparingSection = false, notificationSubscriptions, onToggleSubscription }: DashboardSectionProps) {
-    const pressTimer = useRef<NodeJS.Timeout | null>(null);
-
-    const handlePointerDown = (orderId: string) => {
-      pressTimer.current = setTimeout(() => {
-        if (onToggleSubscription) {
-          if (navigator.vibrate) {
-            navigator.vibrate(50); // Haptic feedback
-          }
-          onToggleSubscription(orderId);
-        }
-      }, 700);
-    };
-  
-    const handlePointerUp = () => {
-      if (pressTimer.current) {
-        clearTimeout(pressTimer.current);
-        pressTimer.current = null;
-      }
-    };
-
     return (
         <Card className={cn("border shadow-sm", className)}>
             <CardHeader>
@@ -145,10 +125,6 @@ function DashboardSection({ title, icon, orders, emptyMessage, className, isPrep
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.4, ease: "easeOut" }}
-                                onContextMenu={(e) => e.preventDefault()}
-                                onPointerDown={isPreparingSection ? () => handlePointerDown(order.id) : undefined}
-                                onPointerUp={isPreparingSection ? handlePointerUp : undefined}
-                                onPointerLeave={isPreparingSection ? handlePointerUp : undefined}
                             >
                                 <OrderCard 
                                     key={order.id} 
@@ -156,6 +132,7 @@ function DashboardSection({ title, icon, orders, emptyMessage, className, isPrep
                                     role="student" 
                                     showBell={isPreparingSection}
                                     isSubscribed={isPreparingSection && notificationSubscriptions?.includes(order.id)}
+                                    onToggleSubscription={onToggleSubscription}
                                 />
                             </motion.div>
                         ))}
