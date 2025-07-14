@@ -145,14 +145,10 @@ function DashboardSection({ title, icon, orders, emptyMessage, className, isPrep
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.4, ease: "easeOut" }}
-                                className="relative group"
                                 onContextMenu={(e) => e.preventDefault()}
-                                whileTap={{ scale: 0.98 }}
-                                {...(isPreparingSection ? {
-                                    onPointerDown: () => handlePointerDown(order.id),
-                                    onPointerUp: handlePointerUp,
-                                    onPointerLeave: handlePointerUp,
-                                } : {})}
+                                onPointerDown={isPreparingSection ? () => handlePointerDown(order.id) : undefined}
+                                onPointerUp={isPreparingSection ? handlePointerUp : undefined}
+                                onPointerLeave={isPreparingSection ? handlePointerUp : undefined}
                             >
                                 <OrderCard 
                                     key={order.id} 
