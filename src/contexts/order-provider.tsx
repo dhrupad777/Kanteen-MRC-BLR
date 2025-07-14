@@ -27,8 +27,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const { toast } = useToast();
   const previousOrdersRef = useRef<Order[]>([]);
-  const lastToggledOrderRef = useRef<{ id: string; subscribed: boolean } | null>(null);
-
   const notificationSubscriptionsRef = useRef(notificationSubscriptions);
 
   useEffect(() => {
@@ -53,27 +51,15 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const toggleNotificationSubscription = useCallback((orderId: string) => {
     setNotificationSubscriptions(prev => {
         const isSubscribed = prev.includes(orderId);
-        lastToggledOrderRef.current = { id: orderId, subscribed: !isSubscribed };
         if(isSubscribed) {
+            toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
             return prev.filter(id => id !== orderId);
         } else {
+            toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
             return [...prev, orderId];
         }
     });
-  }, []);
-
-  useEffect(() => {
-    if (lastToggledOrderRef.current) {
-      const { subscribed } = lastToggledOrderRef.current;
-      if (subscribed) {
-        toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-      } else {
-        toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-      }
-      lastToggledOrderRef.current = null; // Reset after showing toast
-    }
-  }, [notificationSubscriptions, toast]);
-
+  }, [toast]);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
