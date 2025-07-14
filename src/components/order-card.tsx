@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { ArrowRight, Check, Bell, BellRing } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface OrderCardProps {
   order: Order;
@@ -46,24 +47,26 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
   return (
     <Card 
       className={cn(
-        "flex flex-col w-full relative transition-colors duration-300",
+        "flex flex-col w-full relative transition-all duration-300 ease-in-out",
         {
-          "overflow-hidden border-0": role === 'student',
+          "overflow-hidden border-0 shadow-md hover:shadow-lg hover:-translate-y-1": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         }
       )}
     >
       {role === 'student' && showBell && (
-        <button
+        <motion.button
           onClick={handleBellClick}
-          className="absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-white/50"
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="absolute top-1.5 right-1.5 z-10 p-2 rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-white/50"
           aria-label={isSubscribed ? "Unsubscribe from notifications" : "Subscribe to notifications"}
         >
           {isSubscribed 
-            ? <BellRing className="h-5 w-5 text-white" /> 
-            : <Bell className="h-5 w-5 text-blue-800/80" />
+            ? <BellRing className="h-4 w-4 md:h-5 md:w-5 text-white" /> 
+            : <Bell className="h-4 w-4 md:h-5 md:w-5 text-blue-800/80" />
           }
-        </button>
+        </motion.button>
       )}
       <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
         "p-0": role === 'student',
@@ -71,10 +74,10 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
       })}>
         <div className={cn(
             "rounded-lg p-2 w-full font-bold tracking-wider transition-colors duration-300",
-            role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2',
+            role === 'student' ? 'text-4xl md:text-5xl lg:text-6xl p-4 md:p-6' : 'text-5xl px-4 py-2',
             {
               'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing' && !isSubscribed,
-              'bg-blue-800 dark:bg-blue-700 text-white': order.status === 'Preparing' && isSubscribed,
+              'bg-blue-800 dark:bg-blue-700 text-white shadow-inner': order.status === 'Preparing' && isSubscribed,
               'bg-green-200/90 dark:bg-green-900/50 text-green-900 dark:text-green-200': order.status === 'Ready',
             }
           )}>

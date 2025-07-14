@@ -54,7 +54,7 @@ export default function StudentDashboardPage() {
 
   if (loading || !user) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
       </div>
     );
@@ -63,8 +63,8 @@ export default function StudentDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-headline text-3xl font-bold">Your Order Status</h1>
-        <p className="text-muted-foreground">Track the real-time status of your food order. Click the bell on a preparing coupon to get notified when it's ready.</p>
+        <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Order Status</h1>
+        <p className="text-muted-foreground mt-1">Track the real-time status of your food order. Click the bell on a preparing coupon to get notified when it's ready.</p>
       </div>
 
       <DashboardSection 
@@ -113,14 +113,14 @@ function DashboardSection({
     return (
         <Card className={cn("border shadow-sm", className)}>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl font-bold flex items-center gap-3 text-foreground/80">
+                <CardTitle className="font-headline text-xl md:text-2xl font-bold flex items-center gap-3 text-foreground/80">
                     {icon}
                     <span>{title} ({orders.length})</span>
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 {orders.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
                         <AnimatePresence>
                         {orders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
                              <motion.div
@@ -143,7 +143,7 @@ function DashboardSection({
                         </AnimatePresence>
                     </div>
                 ) : (
-                    <p className="text-muted-foreground">{emptyMessage}</p>
+                    <p className="text-muted-foreground p-4 text-center">{emptyMessage}</p>
                 )}
             </CardContent>
         </Card>

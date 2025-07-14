@@ -17,7 +17,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Undo2 } from 'lucide-react';
@@ -62,7 +61,7 @@ export default function StaffDashboardPage() {
 
   if (loading || !user) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
       </div>
     );
@@ -70,15 +69,15 @@ export default function StaffDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-headline text-3xl font-bold">Order Manager</h1>
-          <p className="text-muted-foreground">Add new orders and manage their status.</p>
+          <h1 className="font-headline text-2xl md:text-3xl font-bold">Order Manager</h1>
+          <p className="text-muted-foreground mt-1">Add new orders and manage their status.</p>
         </div>
       </div>
       <div className="space-y-8">
           <CouponEntryForm />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           {orderColumns.map(column => {
               const columnOrders = orders.filter(o => o.status === column.status);
               return (

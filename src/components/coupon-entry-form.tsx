@@ -37,7 +37,7 @@ export function CouponEntryForm() {
   return (
     <Card className="bg-secondary/40 border-0">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl flex items-center gap-2">
+        <CardTitle className="font-headline text-xl md:text-2xl flex items-center gap-2">
             <Ticket className="text-primary"/>
             Create New Order
         </CardTitle>
@@ -45,12 +45,12 @@ export function CouponEntryForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-end gap-4">
             <FormField
               control={form.control}
               name="couponId"
               render={({ field }) => (
-                <FormItem className="flex-grow">
+                <FormItem className="flex-grow w-full">
                   <FormLabel>Coupon Number</FormLabel>
                   <FormControl>
                     <Input 
@@ -69,7 +69,7 @@ export function CouponEntryForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg">
+            <Button type="submit" size="lg" className="w-full sm:w-auto">
               <PlusCircle />
               Add Order
             </Button>
