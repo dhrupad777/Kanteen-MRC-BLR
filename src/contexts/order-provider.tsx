@@ -27,11 +27,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const { toast } = useToast();
   const previousOrdersRef = useRef<Order[]>([]);
-  const notificationSubscriptionsRef = useRef(notificationSubscriptions);
-
-  useEffect(() => {
-    notificationSubscriptionsRef.current = notificationSubscriptions;
-  }, [notificationSubscriptions]);
 
   useEffect(() => {
     previousOrdersRef.current = orders;
@@ -49,14 +44,14 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleNotificationSubscription = useCallback((orderId: string) => {
-    setNotificationSubscriptions(prev => {
-        const isSubscribed = prev.includes(orderId);
+    setNotificationSubscriptions(prevSubs => {
+        const isSubscribed = prevSubs.includes(orderId);
         if(isSubscribed) {
             toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-            return prev.filter(id => id !== orderId);
+            return prevSubs.filter(id => id !== orderId);
         } else {
             toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-            return [...prev, orderId];
+            return [...prevSubs, orderId];
         }
     });
   }, [toast]);
@@ -80,10 +75,17 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       
       ordersData.forEach(newOrder => {
         const oldOrder = previousOrders.find(o => o.id === newOrder.id);
-        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing' && notificationSubscriptionsRef.current.includes(newOrder.id)) {
-          sendReadyNotification(newOrder);
-          // We can remove the subscription now that the notification has been sent.
-          setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
+        // Check if the order just became ready and is in the subscription list
+        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
+            setNotificationSubscriptions(currentSubs => {
+                if (currentSubs.includes(newOrder.id)) {
+                    sendReadyNotification(newOrder);
+                    // Return a new array without the notified order ID
+                    return currentSubs.filter(id => id !== newOrder.id);
+                }
+                // Return the existing array if no notification was sent
+                return currentSubs;
+            });
         }
       });
       

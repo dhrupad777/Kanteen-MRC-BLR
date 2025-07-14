@@ -59,7 +59,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
         >
             {isSubscribed 
               ? <BellRing className="h-5 w-5 text-white" /> 
-              : <Bell className="h-5 w-5 text-primary/80" />
+              : <Bell className="h-5 w-5 text-blue-800/80" />
             }
         </button>
       )}
