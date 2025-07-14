@@ -22,7 +22,7 @@ export default function RoleSelectionPage() {
           href="/student"
           icon={<User className="w-12 h-12 text-primary" />}
           title="Customer"
-          description="View your order status and get notified when it's ready."
+          description="View your order status in real-time."
         />
         <RoleCard
           href="/login"

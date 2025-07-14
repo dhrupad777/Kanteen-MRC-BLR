@@ -26,17 +26,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const { toast } = useToast();
 
-  const sendReadyNotification = useCallback((order: Order) => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('Kanteen Order Ready!', {
-          body: `Your order for coupon #${order.studentId.split('-')[1]} is ready for pickup.`,
-          icon: '/favicon.ico'
-        });
-      }
-    }
-  }, []);
-
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -50,15 +39,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
                 status: data.status,
                 createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate() : new Date(),
             });
-        });
-
-        // This basic notification will fire for any order that becomes ready.
-        // It is no longer tied to a specific user's subscription.
-        newOrders.forEach(newOrder => {
-            const oldOrder = prevOrdersRef.current.find(o => o.id === newOrder.id);
-            if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
-                sendReadyNotification(newOrder);
-            }
         });
         
         setOrders(newOrders);
@@ -74,7 +54,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification]);
+  }, [toast]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
