@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from "react";
@@ -59,10 +60,17 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             });
         }
       }
+    }, (error) => {
+        console.error("Error with Firestore snapshot: ", error);
+        toast({
+            title: "Connection Error",
+            description: "Could not sync with the database. Please check your connection.",
+            variant: "destructive"
+        })
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
