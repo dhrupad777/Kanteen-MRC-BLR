@@ -37,26 +37,12 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
 
   return (
     <Card className={cn(
-        "flex flex-col transition-all duration-300 overflow-visible w-full border-0 relative", // changed overflow-hidden to overflow-visible
+        "flex flex-col transition-all duration-300 w-full",
         {
-          "hover:shadow-xl hover:-translate-y-1": role === 'student',
+          "hover:shadow-xl hover:-translate-y-1 overflow-visible border-0": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         }
       )}>
-      <AnimatePresence>
-        {role === 'staff' && (
-          <motion.div
-            key="mascot"
-            initial={{ opacity: 0, scale: 0.8, x: 20 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.8, x: 20 }}
-            transition={{ duration: 0.3 }}
-            className="absolute -right-4 -top-6 w-24 h-24 opacity-0 group-hover/order:opacity-100 transition-opacity duration-300 pointer-events-none"
-          >
-            <KanteenMascot state={order.status === 'Preparing' ? 'preparing' : 'ready'} />
-          </motion.div>
-        )}
-      </AnimatePresence>
       <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
         "p-0": role === 'student',
         "p-0 flex-shrink-0": role === 'staff'
@@ -81,4 +67,3 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
     </Card>
   );
 }
-
