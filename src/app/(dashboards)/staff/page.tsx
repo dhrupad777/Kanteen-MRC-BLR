@@ -25,9 +25,7 @@ import { EditCouponForm } from '@/components/edit-coupon-form';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { Loader2, BrainCircuit } from 'lucide-react';
-import { BottleneckPredictor } from '@/components/bottleneck-predictor';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Loader2 } from 'lucide-react';
 
 
 export default function StaffDashboardPage() {
@@ -75,97 +73,81 @@ export default function StaffDashboardPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-headline text-2xl md:text-3xl font-bold">Manager Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Manage orders and gain AI-powered insights.</p>
+          <p className="text-muted-foreground mt-1">Manage all active orders.</p>
         </div>
       </div>
-      <Tabs defaultValue="orders" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="orders">Order Manager</TabsTrigger>
-            <TabsTrigger value="insights">
-                <BrainCircuit className="mr-2 h-4 w-4"/>
-                AI Insights
-            </TabsTrigger>
-        </TabsList>
-        <TabsContent value="orders">
-            <div className="space-y-8 pt-4">
-                <CouponEntryForm />
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                {orderColumns.map(column => {
-                    const columnOrders = orders.filter(o => o.status === column.status);
-                    return (
-                    <div key={column.title} className={cn("space-y-4 p-4 rounded-xl h-full", column.className)}>
-                        <h2 className="font-headline text-xl font-semibold flex items-center px-2 text-foreground/80">
-                            {column.icon}
-                            {column.title} ({columnOrders.length})
-                        </h2>
-                        <div className="space-y-3">
-                        <AnimatePresence>
-                        {columnOrders.length > 0 ? (
-                            columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
-                            <motion.div 
-                                key={order.id} 
-                                layout 
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                                className="flex items-center gap-2"
-                            >
-                                <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
-                                <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
-                                {order.status === 'Preparing' && (
-                                    <>
-                                    <Button variant="outline" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110" onClick={() => handleEditClick(order)}>
-                                        <Edit className="h-4 w-4" />
-                                        <span className="sr-only">Edit</span>
+      <div className="space-y-8 pt-4">
+        <CouponEntryForm />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          {orderColumns.map(column => {
+            const columnOrders = orders.filter(o => o.status === column.status);
+            return (
+              <div key={column.title} className={cn("space-y-4 p-4 rounded-xl h-full", column.className)}>
+                <h2 className="font-headline text-xl font-semibold flex items-center px-2 text-foreground/80">
+                  {column.icon}
+                  {column.title} ({columnOrders.length})
+                </h2>
+                <div className="space-y-3">
+                  <AnimatePresence>
+                    {columnOrders.length > 0 ? (
+                      columnOrders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
+                        <motion.div
+                          key={order.id}
+                          layout
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          className="flex items-center gap-2"
+                        >
+                          <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
+                          <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
+                            {order.status === 'Preparing' && (
+                              <>
+                                <Button variant="outline" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110" onClick={() => handleEditClick(order)}>
+                                  <Edit className="h-4 w-4" />
+                                  <span className="sr-only">Edit</span>
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110">
+                                      <Trash2 className="h-4 w-4" />
+                                      <span className="sr-only">Delete</span>
                                     </Button>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                        <Button variant="destructive" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110">
-                                            <Trash2 className="h-4 w-4" />
-                                            <span className="sr-only">Delete</span>
-                                        </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                            This will permanently delete the order for coupon #{order.studentId.split('-')[1]}. This action cannot be undone.
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => deleteOrder(order.id)}>
-                                            Yes, delete it
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                    </>
-                                )}
-                                {order.status === 'Ready' && (
-                                    <Button variant="outline" size="sm" className="transition-transform duration-200 ease-in-out hover:scale-105" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
-                                        <Undo2 className="mr-1 h-3 w-3" /> Back
-                                    </Button>
-                                )}
-                                </div>
-                            </motion.div>
-                            ))
-                        ) : null }
-                        </AnimatePresence>
-                        </div>
-                    </div>
-                    );
-                })}
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will permanently delete the order for coupon #{order.studentId.split('-')[1]}. This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => deleteOrder(order.id)}>
+                                        Yes, delete it
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </>
+                            )}
+                            {order.status === 'Ready' && (
+                              <Button variant="outline" size="sm" className="transition-transform duration-200 ease-in-out hover:scale-105" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
+                                <Undo2 className="mr-1 h-3 w-3" /> Back
+                              </Button>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))
+                    ) : null}
+                  </AnimatePresence>
                 </div>
-            </div>
-        </TabsContent>
-        <TabsContent value="insights">
-            <div className="pt-4">
-                <BottleneckPredictor />
-            </div>
-        </TabsContent>
-       </Tabs>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
        {editingOrder && (
         <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
