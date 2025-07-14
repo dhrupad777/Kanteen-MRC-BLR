@@ -7,64 +7,24 @@ import { Order } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CupSoda, CookingPot } from 'lucide-react';
 
-
-const STUDENT_ID = 'student-007'; // This is now a generic view for all students
-
 export default function StudentDashboardPage() {
   const { orders } = useOrders();
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
-  const notifiedOrderIds = useRef(new Set());
 
-  // This effect simulates real-time updates by polling.
-  // In a production app, this should be replaced with a WebSocket connection.
+  // Request notification permission on component mount
   useEffect(() => {
-    const fetchOrders = () => {
-        // We get all non-completed orders for the display
-        const nonCompletedOrders = orders.filter(o => o.status === 'Preparing' || o.status === 'Ready');
-        setCurrentOrders(nonCompletedOrders);
-    };
-
-    fetchOrders(); // Initial fetch
-    const intervalId = setInterval(fetchOrders, 2000); // Poll every 2 seconds
-
-    return () => clearInterval(intervalId);
-  }, [orders]);
-
-
-  // Effect for handling notifications
-  useEffect(() => {
-    const checkAndNotify = (orders: Order[]) => {
-      const readyOrders = orders.filter(
-        (order) => order.status === 'Ready' && !notifiedOrderIds.current.has(order.id)
-      );
-      
-      if (readyOrders.length > 0 && typeof window !== 'undefined' && 'Notification' in window) {
-        if (Notification.permission === 'granted') {
-          readyOrders.forEach(order => {
-            new Notification('Kanteen Order Ready!', {
-              body: `Your order ${order.id} is ready for pickup.`,
-            });
-            notifiedOrderIds.current.add(order.id);
-          });
-        } else if (Notification.permission !== 'denied') {
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-               readyOrders.forEach(order => {
-                new Notification('Kanteen Order Ready!', {
-                  body: `Your order ${order.id} is ready for pickup.`,
-                });
-                notifiedOrderIds.current.add(order.id);
-              });
-            }
-          });
-        }
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
+        Notification.requestPermission();
       }
-    };
-    
-    checkAndNotify(currentOrders);
+    }
+  }, []);
 
-  }, [currentOrders]);
-  
+  useEffect(() => {
+    // We get all non-completed orders for the display
+    const nonCompletedOrders = orders.filter(o => o.status === 'Preparing' || o.status === 'Ready');
+    setCurrentOrders(nonCompletedOrders);
+  }, [orders]);
 
   const readyOrders = currentOrders.filter(o => o.status === 'Ready');
   const preparingOrders = currentOrders.filter(o => o.status === 'Preparing');
@@ -114,7 +74,7 @@ function DashboardSection({ title, icon, orders, emptyMessage, isHighlighted = f
             <CardContent>
                 {orders.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {orders.sort((a,b) => parseInt(a.id) - parseInt(b.id)).map(order => <OrderCard key={order.id} order={order} role="student" />)}
+                        {orders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => <OrderCard key={order.id} order={order} role="student" />)}
                     </div>
                 ) : (
                     <p className="text-muted-foreground">{emptyMessage}</p>

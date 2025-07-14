@@ -4,7 +4,7 @@ import type { Order, OrderStatus } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderStatusBadge } from "./order-status-badge";
 import { Button } from "./ui/button";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Clock, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface OrderCardProps {
@@ -13,7 +13,7 @@ interface OrderCardProps {
   onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
 }
 
-const statusProgression: Record<OrderStatus, OrderStatus | null> = {
+const statusProgression: Record<string, OrderStatus | null> = {
   Pending: 'Preparing',
   Preparing: 'Ready',
   Ready: 'Completed',
@@ -28,13 +28,15 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
       onStatusChange(order.id, nextStatus);
     }
   };
+  
+  const couponId = order.studentId.split('-')[1] || order.id;
 
   return (
     <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="font-headline text-xl mb-1">{order.id}</CardTitle>
+            <CardTitle className="font-headline text-xl mb-1">Coupon #{couponId}</CardTitle>
             <div className="text-sm text-muted-foreground flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
               <span>{formatDistanceToNow(order.createdAt, { addSuffix: true })}</span>
@@ -56,8 +58,9 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
       {role === 'staff' && nextStatus && (
         <CardFooter>
           <Button onClick={handleStatusUpdate} className="w-full bg-primary hover:bg-accent transition-colors">
+            {nextStatus === "Completed" ? <Check className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
             <span>Mark as {nextStatus}</span>
-            <ArrowRight className="ml-2 h-4 w-4" />
+            {nextStatus !== "Completed" && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>
         </CardFooter>
       )}

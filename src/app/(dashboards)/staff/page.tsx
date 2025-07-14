@@ -3,7 +3,7 @@
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { OrderStatus } from '@/types';
-import { ChefHat, CookingPot } from 'lucide-react';
+import { ChefHat, CookingPot, CheckCircle } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 
 export default function StaffDashboardPage() {
@@ -12,6 +12,7 @@ export default function StaffDashboardPage() {
   const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode }[] = [
     { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-primary" /> },
     { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-500" /> },
+    { title: 'Completed', status: 'Completed', icon: <CheckCircle className="mr-2 h-5 w-5 text-gray-500" /> },
   ];
 
   return (
@@ -24,7 +25,7 @@ export default function StaffDashboardPage() {
       </div>
       <div className="space-y-8">
           <CouponEntryForm />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           {orderColumns.map(column => {
               const columnOrders = orders.filter(o => o.status === column.status);
               return (
