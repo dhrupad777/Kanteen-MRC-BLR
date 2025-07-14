@@ -64,7 +64,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         console.error("Error with Firestore snapshot: ", error);
         toast({
             title: "Connection Error",
-            description: "Could not sync with the database. Please check your connection.",
+            description: "Could not sync with the database. Please check your connection and Firestore rules.",
             variant: "destructive"
         })
     });
@@ -107,7 +107,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const updateOrderStatus = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     if (newStatus === 'Completed') {
-      // If the order is collected, delete it from the database.
       await deleteOrder(orderId);
       return;
     }
@@ -132,7 +131,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             variant: "destructive"
         })
     }
-  }, [orders, toast]);
+  }, [orders, toast, deleteOrder]);
 
   const deleteOrder = useCallback(async (orderId: string) => {
     const orderRef = doc(db, "orders", orderId);
