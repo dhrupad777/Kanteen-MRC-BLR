@@ -7,34 +7,19 @@ import { useToast } from "@/hooks/use-toast"
 
 
 const initialOrders: Order[] = [
-  // Keeping some examples for different statuses
   {
-    id: 'CPN-101',
+    id: '101',
     studentId: 'student-007',
     items: [{ name: 'Coupon Meal', quantity: 1 }],
     status: 'Preparing',
     createdAt: new Date(Date.now() - 10 * 60 * 1000),
   },
   {
-    id: 'CPN-102',
-    studentId: 'student-123',
-    items: [{ name: 'Coupon Meal', quantity: 1 }],
-    status: 'Preparing',
-    createdAt: new Date(Date.now() - 8 * 60 * 1000),
-  },
-  {
-    id: 'CPN-103',
+    id: '103',
     studentId: 'student-456',
     items: [{ name: 'Coupon Meal', quantity: 1 }],
     status: 'Ready',
     createdAt: new Date(Date.now() - 15 * 60 * 1000),
-  },
-    {
-    id: 'CPN-104',
-    studentId: 'student-007',
-    items: [{ name: 'Coupon Meal', quantity: 1 }],
-    status: 'Completed',
-    createdAt: new Date(Date.now() - 60 * 60 * 1000),
   },
 ];
 
@@ -53,8 +38,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   const addOrder = useCallback((couponId: string) => {
-    // For simplicity, we assign a random student ID. In a real app, this would be linked to the coupon.
-    const studentId = `student-${Math.floor(Math.random() * 1000)}`;
+    // Student ID is not really used per new requirements, but we keep the data structure consistent.
+    const studentId = `student-${couponId}`;
     const newOrder: Order = {
       id: couponId,
       studentId: studentId,
@@ -65,10 +50,10 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
     setOrders(prevOrders => {
       // Prevent duplicate coupon entries
-      if (prevOrders.some(o => o.id === couponId)) {
+      if (prevOrders.some(o => o.id === couponId && o.status !== 'Completed')) {
         toast({
-          title: "Coupon Already Exists",
-          description: `Coupon ${couponId} is already in the system.`,
+          title: "Coupon Already In Progress",
+          description: `Coupon ${couponId} is already in the Preparing or Ready queue.`,
           variant: "destructive"
         })
         return prevOrders;

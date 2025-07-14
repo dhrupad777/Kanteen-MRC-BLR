@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, User, UtensilsCrossed, MonitorPlay } from 'lucide-react';
+import { ArrowRight, User, UtensilsCrossed } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KanteenHeader } from '@/components/kanteen-header';
@@ -18,24 +18,18 @@ export default function RoleSelectionPage() {
         </p>
       </header>
 
-      <main className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+      <main className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
         <RoleCard
           href="/student"
           icon={<User className="w-12 h-12 text-primary" />}
-          title="Student"
+          title="Log in as Customer"
           description="View your order status and get notified when it's ready."
         />
         <RoleCard
           href="/staff"
           icon={<UtensilsCrossed className="w-12 h-12 text-primary" />}
-          title="Canteen Staff"
+          title="Log in as Order Manager"
           description="Manage orders by coupon and get kitchen insights."
-        />
-         <RoleCard
-          href="/ready-display"
-          icon={<MonitorPlay className="w-12 h-12 text-primary" />}
-          title="Ready Display"
-          description="A public screen showing all orders ready for pickup."
         />
       </main>
       <footer className="mt-16 text-center text-muted-foreground text-sm">

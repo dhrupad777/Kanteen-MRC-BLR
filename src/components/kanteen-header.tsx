@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Utensils, Home, User, UtensilsCrossed, MonitorPlay } from "lucide-react"
+import { Utensils, Home, User, UtensilsCrossed } from "lucide-react"
 import { usePathname } from 'next/navigation'
 import { cn } from "@/lib/utils"
 
@@ -9,9 +9,8 @@ export function KanteenHeader() {
 
   const navLinks = [
     { href: "/", label: "Home", icon: <Home className="w-4 h-4" /> },
-    { href: "/student", label: "Student", icon: <User className="w-4 h-4" /> },
-    { href: "/staff", label: "Staff", icon: <UtensilsCrossed className="w-4 h-4" /> },
-    { href: "/ready-display", label: "Display", icon: <MonitorPlay className="w-4 h-4" /> },
+    { href: "/student", label: "Customer", icon: <User className="w-4 h-4" /> },
+    { href: "/staff", label: "Manager", icon: <UtensilsCrossed className="w-4 h-4" /> },
   ]
 
   return (

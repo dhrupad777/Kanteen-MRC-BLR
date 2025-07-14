@@ -12,7 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Ticket } from 'lucide-react';
 
 const formSchema = z.object({
-  couponId: z.string().min(3, 'Coupon ID must be at least 3 characters.').regex(/^[A-Z0-9-]+$/, 'Coupon ID can only contain uppercase letters, numbers, and dashes.'),
+  couponId: z.coerce
+    .number()
+    .min(1, 'Coupon number must be at least 1.')
+    .max(200, 'Coupon number must be no more than 200.'),
 });
 
 export function CouponEntryForm() {
@@ -21,12 +24,12 @@ export function CouponEntryForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      couponId: '',
+      couponId: undefined,
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    addOrder(values.couponId.toUpperCase());
+    addOrder(values.couponId.toString());
     form.reset();
   }
 
@@ -37,7 +40,7 @@ export function CouponEntryForm() {
             <Ticket className="text-primary"/>
             Enter Coupon
         </CardTitle>
-        <CardDescription>Enter a student's coupon ID to add their order to the 'Preparing' queue.</CardDescription>
+        <CardDescription>Enter a coupon number (1-200) to add an order to the 'Preparing' queue.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -47,9 +50,9 @@ export function CouponEntryForm() {
               name="couponId"
               render={({ field }) => (
                 <FormItem className="flex-grow">
-                  <FormLabel>Coupon ID</FormLabel>
+                  <FormLabel>Coupon Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. CPN-123" {...field} />
+                    <Input type="number" placeholder="e.g. 42" {...field} onChange={event => field.onChange(event.target.valueAsNumber)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
