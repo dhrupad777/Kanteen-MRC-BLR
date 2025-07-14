@@ -1,11 +1,11 @@
 
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CupSoda, CookingPot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -30,9 +30,14 @@ export default function StudentDashboardPage() {
 
   const handleToggleSubscription = (orderId: string) => {
     if(Notification.permission !== 'granted') {
-        Notification.requestPermission();
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                toggleNotificationSubscription(orderId);
+            }
+        });
+    } else {
+        toggleNotificationSubscription(orderId);
     }
-    toggleNotificationSubscription(orderId);
   }
 
   const readyOrders = currentOrders.filter(o => o.status === 'Ready');
@@ -79,6 +84,23 @@ interface DashboardSectionProps {
 }
 
 function DashboardSection({ title, icon, orders, emptyMessage, className, isPreparingSection = false, notificationSubscriptions, onToggleSubscription }: DashboardSectionProps) {
+    const pressTimer = useRef<NodeJS.Timeout | null>(null);
+
+    const handlePointerDown = (orderId: string) => {
+      pressTimer.current = setTimeout(() => {
+        if (onToggleSubscription) {
+          onToggleSubscription(orderId);
+        }
+      }, 700);
+    };
+  
+    const handlePointerUp = () => {
+      if (pressTimer.current) {
+        clearTimeout(pressTimer.current);
+        pressTimer.current = null;
+      }
+    };
+
     return (
         <Card className={cn("border shadow-sm", className)}>
             <CardHeader>
@@ -101,26 +123,11 @@ function DashboardSection({ title, icon, orders, emptyMessage, className, isPrep
                                 transition={{ duration: 0.4, ease: "easeOut" }}
                                 className="relative group"
                                 onContextMenu={(e) => e.preventDefault()}
-                                onPointerDown={(e) => {
-                                  // Prevent context menu on long press on touch devices
-                                  const target = e.target as HTMLElement;
-                                  target.style.touchAction = 'none';
-                                }}
-                                onPointerUp={(e) => {
-                                  const target = e.target as HTMLElement;
-                                  target.style.touchAction = 'auto';
-                                }}
-                                {...(isPreparingSection && onToggleSubscription ? {
-                                    onTap: () => {
-                                      // This is a short tap, you can add feedback if needed
-                                    },
-                                    onTapStart: (e) => {
-                                       e.currentTarget.setAttribute('data-long-press', 'true');
-                                    },
-                                    whileTap: { scale: 0.98 },
-                                    onLongPress: () => {
-                                       onToggleSubscription(order.id)
-                                    },
+                                whileTap={{ scale: 0.98 }}
+                                {...(isPreparingSection ? {
+                                    onPointerDown: () => handlePointerDown(order.id),
+                                    onPointerUp: handlePointerUp,
+                                    onPointerLeave: handlePointerUp,
                                 } : {})}
                             >
                                 <OrderCard 
