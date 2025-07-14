@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast"
 
@@ -35,21 +35,31 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [lastUpdatedOrder, setLastUpdatedOrder] = useState<{ id: string; status: OrderStatus } | null>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (lastUpdatedOrder && lastUpdatedOrder.status === 'Ready') {
+      toast({
+        title: "Order Ready!",
+        description: `Order ${lastUpdatedOrder.id} is now ready for pickup.`,
+      });
+      // Reset after showing toast to prevent re-firing on other re-renders
+      setLastUpdatedOrder(null); 
+    }
+  }, [lastUpdatedOrder, toast]);
+
+
   const addOrder = useCallback((couponId: string) => {
-    // Student ID is not really used per new requirements, but we keep the data structure consistent.
-    const studentId = `student-${couponId}`;
     const newOrder: Order = {
       id: couponId,
-      studentId: studentId,
+      studentId: `student-${couponId}`,
       items: [{ name: 'Coupon Meal', quantity: 1 }],
       status: 'Preparing',
       createdAt: new Date(),
     };
 
     setOrders(prevOrders => {
-      // Prevent duplicate coupon entries
       if (prevOrders.some(o => o.id === couponId && o.status !== 'Completed')) {
         toast({
           title: "Coupon Already In Progress",
@@ -64,20 +74,13 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const updateOrderStatus = useCallback((orderId: string, newStatus: OrderStatus) => {
     setOrders(prevOrders =>
-      prevOrders.map(order => {
-        if (order.id === orderId) {
-          if (newStatus === 'Ready') {
-            toast({
-              title: "Order Ready!",
-              description: `Order ${orderId} is now ready for pickup.`,
-            })
-          }
-          return { ...order, status: newStatus };
-        }
-        return order;
-      })
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
     );
-  }, [toast]);
+    // Track the last updated order to trigger the toast effect
+    setLastUpdatedOrder({ id: orderId, status: newStatus });
+  }, []);
 
   const getOrdersByStudent = useCallback((studentId: string) => {
     return orders.filter(order => order.studentId === studentId);
