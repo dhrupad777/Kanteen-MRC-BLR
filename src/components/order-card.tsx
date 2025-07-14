@@ -37,16 +37,16 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
 
   return (
     <Card className={cn(
-        "flex flex-col transition-all duration-300 w-full relative",
+        "flex flex-col w-full relative transition-all duration-700 ease-in-out",
         {
-          "hover:shadow-xl hover:-translate-y-1 overflow-visible border-0 group/order": role === 'student',
+          "hover:shadow-xl hover:-translate-y-1 overflow-hidden border-0 group/order": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         },
-        isSubscribed && 'bg-gradient-to-br from-blue-200/80 to-purple-200/80 dark:from-blue-900/50 dark:to-purple-900/50'
+        isSubscribed && 'bg-gradient-to-br from-blue-200/90 to-purple-200/90 dark:from-blue-800/60 dark:to-purple-800/60'
       )}>
        {role === 'student' && showBell && (
-        <div className="absolute top-2 right-2 text-primary/70">
-            {isSubscribed ? <BellRing className="h-5 w-5 animate-pulse" /> : <Bell className="h-5 w-5" />}
+        <div className="absolute top-2 right-2 text-primary/70 transition-all duration-700 ease-in-out">
+            {isSubscribed ? <BellRing className="h-5 w-5 animate-pulse text-primary" /> : <Bell className="h-5 w-5" />}
         </div>
       )}
       <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
@@ -55,11 +55,12 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
       })}>
         <div className={cn(
             "rounded-lg p-2 w-full font-bold font-mono tabular-nums tracking-wider",
-            order.status === 'Preparing' && 'bg-blue-100/80 text-blue-900',
-            order.status === 'Ready' && 'bg-green-100/80 text-green-900',
+            order.status === 'Preparing' && 'bg-blue-100/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100',
+            order.status === 'Ready' && 'bg-green-100/90 dark:bg-green-900/50 text-green-900 dark:text-green-100',
+            isSubscribed && '!bg-transparent',
             role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2'
           )}>
-            <p className="font-mono tabular-nums">{couponId}</p>
+            <p className={cn("font-mono tabular-nums", isSubscribed && "text-primary-foreground")}>{couponId}</p>
         </div>
       </CardContent>
       {role === 'staff' && nextStatus && (
