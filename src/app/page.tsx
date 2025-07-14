@@ -29,7 +29,7 @@ export default function RoleSelectionPage() {
           description="View your order status and get notified when it's ready."
         />
         <RoleCard
-          href="/staff"
+          href="/login"
           icon={<UtensilsCrossed className="w-12 h-12 text-primary" />}
           title="Order Manager"
           description="Manage orders by coupon and get kitchen insights."

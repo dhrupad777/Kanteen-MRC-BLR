@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order, OrderStatus } from '@/types';
-import { ChefHat, CookingPot, CheckCircle } from 'lucide-react';
+import { ChefHat, CookingPot } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 import { cn } from '@/lib/utils';
 import {
@@ -23,12 +23,24 @@ import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Undo2 } from 'lucide-react';
 import { EditCouponForm } from '@/components/edit-coupon-form';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 
 export default function StaffDashboardPage() {
   const { orders, updateOrderStatus, deleteOrder, updateOrderCoupon } = useOrders();
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
 
   const handleEditClick = (order: Order) => {
     setEditingOrder(order);
@@ -47,6 +59,14 @@ export default function StaffDashboardPage() {
     { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "bg-sky-100 dark:bg-sky-900/30" },
     { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "bg-green-100 dark:bg-green-900/30" },
   ];
+
+  if (loading || !user) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
