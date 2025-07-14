@@ -105,6 +105,24 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [orders, toast]);
 
+  const deleteOrder = useCallback(async (orderId: string) => {
+    const orderRef = doc(db, "orders", orderId);
+    try {
+      await deleteDoc(orderRef);
+      toast({
+        title: "Order Removed",
+        description: "The order has been successfully removed.",
+      });
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+      toast({
+        title: "Error",
+        description: "Could not remove order. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
   const updateOrderStatus = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     if (newStatus === 'Completed') {
       await deleteOrder(orderId);
@@ -132,24 +150,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         })
     }
   }, [orders, toast, deleteOrder]);
-
-  const deleteOrder = useCallback(async (orderId: string) => {
-    const orderRef = doc(db, "orders", orderId);
-    try {
-      await deleteDoc(orderRef);
-      toast({
-        title: "Order Removed",
-        description: "The order has been successfully removed.",
-      });
-    } catch (error) {
-      console.error("Error deleting document: ", error);
-      toast({
-        title: "Error",
-        description: "Could not remove order. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [toast]);
 
   const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
     const orderRef = doc(db, "orders", orderId);
