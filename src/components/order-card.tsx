@@ -37,16 +37,17 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
 
   return (
     <Card className={cn(
-        "flex flex-col w-full relative transition-all duration-700 ease-in-out",
+        "flex flex-col w-full relative transition-all duration-300 ease-in-out",
         {
           "hover:shadow-xl hover:-translate-y-1 overflow-hidden border-0 group/order": role === 'student',
           "flex-row items-center p-0": role === 'staff',
-        }
+        },
+        isSubscribed && "shadow-lg"
       )}>
        {role === 'student' && showBell && (
-        <div className="absolute top-2 right-2 text-primary/70 transition-all duration-700 ease-in-out z-10">
+        <div className="absolute top-2 right-2 text-primary/70 transition-all duration-300 ease-in-out z-10">
             {isSubscribed 
-              ? <BellRing className="h-5 w-5 animate-pulse text-primary-foreground" /> 
+              ? <BellRing className="h-5 w-5 animate-pulse text-white" /> 
               : <Bell className="h-5 w-5 text-primary/70" />
             }
         </div>
@@ -56,10 +57,10 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
         "p-0 flex-shrink-0": role === 'staff'
       })}>
         <div className={cn(
-            "rounded-lg p-2 w-full font-bold tabular-nums tracking-wider font-mono transition-all duration-700 ease-in-out",
-            order.status === 'Preparing' && 'bg-blue-100/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100',
-            order.status === 'Ready' && 'bg-green-100/90 dark:bg-green-900/50 text-green-900 dark:text-green-100',
-            isSubscribed && 'bg-gradient-to-br from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 text-white',
+            "rounded-lg p-2 w-full font-bold tracking-wider transition-all duration-300 ease-in-out",
+            order.status === 'Preparing' && 'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200',
+            order.status === 'Ready' && 'bg-green-200/90 dark:bg-green-900/50 text-green-900 dark:text-green-200',
+            isSubscribed && 'bg-gradient-to-br from-blue-600 to-purple-700 text-white',
             role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2'
           )}>
             <p className="font-mono tabular-nums">{couponId}</p>
