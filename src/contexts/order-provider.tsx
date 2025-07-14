@@ -7,6 +7,7 @@ import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db, auth } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { useAuth } from "@/hooks/use-auth";
 
 interface OrderContextType {
   orders: Order[];
@@ -24,7 +25,7 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const prevOrdersRef = useRef<Order[]>([]);
-
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -171,22 +172,29 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, [orders]);
 
  const toggleNotificationSubscription = useCallback(async (couponId: string, subscribed: boolean) => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    if (!user) {
       toast({ title: "Not Logged In", description: "You must be logged in to manage notifications.", variant: "destructive" });
       return;
     }
 
-    const userProfileRef = doc(db, "users", currentUser.uid);
+    const userProfileRef = doc(db, "users", user.uid);
 
     try {
       if (subscribed) {
         await updateDoc(userProfileRef, {
           subscriptions: arrayUnion(couponId)
         });
+        toast({
+          title: "Notifications Enabled",
+          description: `You will now receive a notification when order #${couponId} is ready.`,
+        });
       } else {
         await updateDoc(userProfileRef, {
           subscriptions: arrayRemove(couponId)
+        });
+        toast({
+          title: "Notifications Disabled",
+          description: `You will no longer receive notifications for order #${couponId}.`,
         });
       }
     } catch (error) {
@@ -197,7 +205,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [user, toast]);
 
 
   const value = {

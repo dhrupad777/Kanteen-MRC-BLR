@@ -13,7 +13,6 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useToast } from '@/hooks/use-toast';
 
 export default function StudentDashboardPage() {
   const { orders, toggleNotificationSubscription } = useOrders();
@@ -26,33 +25,6 @@ export default function StudentDashboardPage() {
     }
   }, [user, loading, router]);
 
-  const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (userProfile?.subscriptions) {
-      setNotificationSubscriptions(userProfile.subscriptions);
-    }
-  }, [userProfile]);
-
-  const handleToggle = (couponId: string) => {
-    const isSubscribed = notificationSubscriptions.includes(couponId);
-    
-    toggleNotificationSubscription(couponId, !isSubscribed);
-
-    if (!isSubscribed) {
-       toast({
-        title: "Notifications Enabled",
-        description: `You will now receive a notification when order #${couponId} is ready.`,
-      });
-    } else {
-       toast({
-        title: "Notifications Disabled",
-        description: `You will no longer receive notifications for order #${couponId}.`,
-      });
-    }
-  };
-
 
   if (loading || !user) {
     return (
@@ -62,16 +34,22 @@ export default function StudentDashboardPage() {
     );
   }
 
+  const userSubscriptions = userProfile?.subscriptions || [];
   const userOrders = orders.filter(o => userProfile && userProfile.subscriptions.includes(o.studentId.split('-')[1]));
   
   const readyOrders = userOrders.filter(o => o.status === 'Ready');
   const preparingOrders = userOrders.filter(o => o.status === 'Preparing');
   
+  const handleToggle = (couponId: string) => {
+    const isSubscribed = userSubscriptions.includes(couponId);
+    toggleNotificationSubscription(couponId, !isSubscribed);
+  };
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Order Status</h1>
-        <p className="text-muted-foreground mt-1">Track the real-time status of your food order.</p>
+        <p className="text-muted-foreground mt-1">Track the real-time status of your food order. Toggle the bell to receive notifications.</p>
       </div>
 
        {userOrders.length === 0 && (
@@ -97,7 +75,7 @@ export default function StudentDashboardPage() {
             emptyMessage="No orders are ready for pickup yet."
             className="bg-green-100/60 dark:bg-green-900/30 border-green-300/20 dark:border-green-700/50"
             onToggle={handleToggle}
-            subscriptions={notificationSubscriptions}
+            subscriptions={userSubscriptions}
         />
       )}
 
@@ -109,7 +87,7 @@ export default function StudentDashboardPage() {
             emptyMessage="You have no orders being prepared."
             className="bg-sky-100/60 dark:bg-sky-900/30 border-sky-300/20 dark:border-sky-700/50"
             onToggle={handleToggle}
-            subscriptions={notificationSubscriptions}
+            subscriptions={userSubscriptions}
         />
       )}
     </div>
