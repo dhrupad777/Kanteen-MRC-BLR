@@ -70,6 +70,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: isCustomer ? 'customer' : 'manager',
       subscriptions: isCustomer ? [] : undefined,
     };
+    
+    // Explicitly check for undefined before assigning empty array
+    if (isCustomer && dataToSet.subscriptions === undefined) {
+      dataToSet.subscriptions = [];
+    } else if (!isCustomer) {
+      delete dataToSet.subscriptions;
+    }
+    
     await setDoc(userRef, dataToSet);
 
     return userCredential;
