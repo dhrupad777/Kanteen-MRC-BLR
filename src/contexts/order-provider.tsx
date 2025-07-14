@@ -4,7 +4,6 @@
 import type { ReactNode } from "react";
 import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { Order, OrderStatus } from '@/types';
-import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
 
@@ -22,7 +21,6 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const { toast } = useToast();
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
@@ -43,25 +41,16 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
-        toast({
-            title: "Connection Error",
-            description: "Could not sync with the database. Please check your connection.",
-            variant: "destructive"
-        })
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, []);
 
 
   const addOrder = useCallback(async (couponId: string) => {
     const activeOrder = orders.find(o => o.studentId === `student-${couponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
       if (activeOrder) {
-        toast({
-          title: "Coupon In Use",
-          description: `Coupon #${couponId} is already in the queue.`,
-          variant: "destructive"
-        })
+        console.warn(`Coupon #${couponId} is already in the queue.`);
         return;
       }
     
@@ -72,38 +61,20 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         status: 'Preparing',
         createdAt: serverTimestamp(),
       });
-      toast({
-        title: "Order Added",
-        description: `Coupon #${couponId} is now in the 'Preparing' queue.`,
-      })
     } catch (error) {
         console.error("Error adding document: ", error);
-        toast({
-            title: "Error",
-            description: "Could not add order. Please try again.",
-            variant: "destructive"
-        })
     }
-  }, [orders, toast]);
+  }, [orders]);
 
   const deleteOrder = useCallback(async (orderId: string) => {
     const orderRef = doc(db, "orders", orderId);
     try {
       await deleteDoc(orderRef);
-      toast({
-        title: "Order Removed",
-        description: "The order has been successfully removed.",
-      });
     } catch (error)
       {
       console.error("Error deleting document: ", error);
-      toast({
-        title: "Error",
-        description: "Could not remove order. Please try again.",
-        variant: "destructive",
-      });
     }
-  }, [toast]);
+  }, []);
 
   const updateOrderStatus = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     if (newStatus === 'Completed') {
@@ -119,22 +90,13 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         
     } catch (error) {
          console.error("Error updating document: ", error);
-        toast({
-            title: "Error",
-            description: "Could not update order status. Please try again.",
-            variant: "destructive"
-        })
     }
-  }, [toast, deleteOrder]);
+  }, [deleteOrder]);
 
   const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
     const activeOrder = orders.find(o => o.studentId === `student-${newCouponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
       if (activeOrder) {
-        toast({
-          title: "Coupon In Use",
-          description: `Coupon #${newCouponId} is already in the queue.`,
-          variant: "destructive"
-        })
+        console.warn(`Coupon #${newCouponId} is already in the queue.`);
         return;
       }
 
@@ -143,19 +105,10 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       await updateDoc(orderRef, {
         studentId: `student-${newCouponId}`,
       });
-      toast({
-        title: "Order Updated",
-        description: `Coupon number has been updated to #${newCouponId}.`,
-      });
     } catch (error) {
       console.error("Error updating document: ", error);
-      toast({
-        title: "Error",
-        description: "Could not update coupon number. Please try again.",
-        variant: "destructive",
-      });
     }
-  }, [orders, toast]);
+  }, [orders]);
 
 
   const getOrdersByStudent = useCallback((studentId: string) => {
