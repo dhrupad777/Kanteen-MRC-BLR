@@ -45,26 +45,26 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       });
 
       const previousOrders = previousOrdersRef.current;
-      const justReadyOrder = ordersData.find(newOrder => {
-          const oldOrder = previousOrders.find(o => o.id === newOrder.id);
-          return newOrder.status === 'Ready' && oldOrder?.status === 'Preparing';
+      
+      ordersData.forEach(newOrder => {
+        const oldOrder = previousOrders.find(o => o.id === newOrder.id);
+        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
+          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+             new Notification('Kanteen Order Ready!', {
+              body: `Your order for coupon #${newOrder.studentId.split('-')[1]} is ready for pickup.`,
+              icon: '/favicon.ico'
+            });
+          }
+        }
       });
       
       setOrders(ordersData);
 
-      if (justReadyOrder) {
-        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-             new Notification('Kanteen Order Ready!', {
-              body: `Your order for coupon #${justReadyOrder.studentId.split('-')[1]} is ready for pickup.`,
-              icon: '/favicon.ico'
-            });
-        }
-      }
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
         toast({
             title: "Connection Error",
-            description: "Could not sync with the database. Please check your connection and Firestore rules.",
+            description: "Could not sync with the database. Please check your connection.",
             variant: "destructive"
         })
     });
@@ -152,6 +152,16 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, [orders, toast, deleteOrder]);
 
   const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
+    const activeOrder = orders.find(o => o.studentId === `student-${newCouponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
+      if (activeOrder) {
+        toast({
+          title: "Coupon In Use",
+          description: `Coupon #${newCouponId} is already in the queue.`,
+          variant: "destructive"
+        })
+        return;
+      }
+
     const orderRef = doc(db, "orders", orderId);
     try {
       await updateDoc(orderRef, {
@@ -169,7 +179,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [orders, toast]);
 
 
   const getOrdersByStudent = useCallback((studentId: string) => {
