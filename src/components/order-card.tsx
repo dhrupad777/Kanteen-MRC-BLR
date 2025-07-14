@@ -63,8 +63,8 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
           aria-label={isSubscribed ? "Unsubscribe from notifications" : "Subscribe to notifications"}
         >
           {isSubscribed 
-            ? <BellRing className="h-4 w-4 md:h-5 md:w-5 text-white" /> 
-            : <Bell className="h-4 w-4 md:h-5 md:w-5 text-blue-800/80" />
+            ? <BellRing className="h-5 w-5 text-white" /> 
+            : <Bell className="h-5 w-5 text-blue-800/80" />
           }
         </motion.button>
       )}
