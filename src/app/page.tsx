@@ -1,19 +1,14 @@
 
 import Link from 'next/link';
-import { User, UtensilsCrossed } from 'lucide-react';
+import { User, ChefHat } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { KanteenHeader } from '@/components/kanteen-header';
-import { KanteenMascot } from '@/components/kanteen-mascot';
-
 
 export default function RoleSelectionPage() {
   return (
     <>
-    <KanteenHeader />
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 -mt-20">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <header className="text-center mb-12 flex flex-col items-center">
-        <KanteenMascot state="default" className="w-40 h-40 mb-4 text-primary" />
+        <ChefHat className="w-40 h-40 mb-4 text-primary" strokeWidth={1} />
         <h1 className="font-headline text-5xl md:text-7xl font-bold text-primary tracking-tighter">
           Kanteen
         </h1>
@@ -31,7 +26,7 @@ export default function RoleSelectionPage() {
         />
         <RoleCard
           href="/login"
-          icon={<UtensilsCrossed className="w-12 h-12 text-primary" />}
+          icon={<ChefHat className="w-12 h-12 text-primary" />}
           title="Order Manager"
           description="Manage orders by coupon and get kitchen insights."
         />

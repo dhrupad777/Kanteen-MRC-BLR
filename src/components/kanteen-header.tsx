@@ -1,7 +1,7 @@
 
 "use client"
 import Link from "next/link"
-import { Utensils, LogOut } from "lucide-react"
+import { ChefHat, LogOut } from "lucide-react"
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from "./ui/button"
 import { useAuth } from "@/hooks/use-auth"
@@ -24,7 +24,7 @@ export function KanteenHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
         <Link href="/" className="flex items-center gap-2 mr-8">
-          <Utensils className="h-7 w-7 text-primary" />
+          <ChefHat className="h-7 w-7 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">Kanteen</span>
         </Link>
         

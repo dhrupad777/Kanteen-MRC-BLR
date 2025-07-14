@@ -26,7 +26,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import { KanteenMascot } from '@/components/kanteen-mascot';
 
 
 export default function StaffDashboardPage() {
@@ -99,21 +98,10 @@ export default function StaffDashboardPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex items-center gap-2 group relative"
+                        className="flex items-center gap-2"
                       >
                         <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
-                        <AnimatePresence>
-                            <motion.div
-                                key="mascot"
-                                initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                                animate={{ opacity: 1, scale: 1, x: 0 }}
-                                exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                                transition={{ duration: 0.3 }}
-                                className="absolute -right-4 -top-6 w-24 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                            >
-                                <KanteenMascot state={order.status === 'Preparing' ? 'preparing' : 'ready'} />
-                            </motion.div>
-                        </AnimatePresence>
+
                         <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
                           {order.status === 'Preparing' && (
                             <>
