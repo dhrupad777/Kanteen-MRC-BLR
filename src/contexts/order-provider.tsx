@@ -5,12 +5,14 @@ import React, { createContext, useCallback, useContext, useState, useEffect, use
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp } from "firebase/firestore";
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
 
 interface OrderContextType {
   orders: Order[];
   addOrder: (couponId: string) => void;
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
+  deleteOrder: (orderId: string) => void;
+  updateOrderCoupon: (orderId: string, newCouponId: string) => void;
   getOrdersByStudent: (studentId: string) => Order[];
   getOrdersByStatus: (status: OrderStatus) => Order[];
 }
@@ -118,6 +120,45 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [orders, toast]);
 
+  const deleteOrder = useCallback(async (orderId: string) => {
+    const orderRef = doc(db, "orders", orderId);
+    try {
+      await deleteDoc(orderRef);
+      toast({
+        title: "Order Deleted",
+        description: "The order has been removed.",
+      });
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+      toast({
+        title: "Error",
+        description: "Could not delete order. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
+  const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
+    const orderRef = doc(db, "orders", orderId);
+    try {
+      await updateDoc(orderRef, {
+        studentId: `student-${newCouponId}`,
+      });
+      toast({
+        title: "Order Updated",
+        description: `Coupon number has been updated to #${newCouponId}.`,
+      });
+    } catch (error) {
+      console.error("Error updating document: ", error);
+      toast({
+        title: "Error",
+        description: "Could not update coupon number. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
+
   const getOrdersByStudent = useCallback((studentId: string) => {
     return orders.filter(order => order.studentId === studentId);
   }, [orders]);
@@ -131,6 +172,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     orders,
     addOrder,
     updateOrderStatus,
+    deleteOrder,
+    updateOrderCoupon,
     getOrdersByStudent,
     getOrdersByStatus,
   };

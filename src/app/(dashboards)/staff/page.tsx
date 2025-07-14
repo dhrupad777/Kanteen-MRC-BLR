@@ -1,14 +1,45 @@
 "use client";
 
+import { useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
-import { OrderStatus } from '@/types';
-import { ChefHat, CookingPot, CheckCircle } from 'lucide-react';
+import { Order, OrderStatus } from '@/types';
+import { ChefHat, CookingPot } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from '@/components/ui/button';
+import { Edit, Trash2, Undo2 } from 'lucide-react';
+import { EditCouponForm } from '@/components/edit-coupon-form';
+
 
 export default function StaffDashboardPage() {
-  const { orders, updateOrderStatus } = useOrders();
+  const { orders, updateOrderStatus, deleteOrder, updateOrderCoupon } = useOrders();
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleEditClick = (order: Order) => {
+    setEditingOrder(order);
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleEditSubmit = (newCouponId: number) => {
+    if (editingOrder) {
+      updateOrderCoupon(editingOrder.id, newCouponId.toString());
+    }
+    setIsEditDialogOpen(false);
+    setEditingOrder(null);
+  };
 
   const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode, className: string }[] = [
     { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "bg-sky-100 dark:bg-sky-900/30" },
@@ -37,7 +68,44 @@ export default function StaffDashboardPage() {
                   <div className="space-y-4">
                   {columnOrders.length > 0 ? (
                       columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
-                      <OrderCard key={order.id} order={order} role="staff" onStatusChange={updateOrderStatus} />
+                      <div key={order.id} className="space-y-2">
+                        <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
+                        <div className="flex justify-center gap-2">
+                          {order.status === 'Preparing' && (
+                            <>
+                              <Button variant="outline" size="sm" onClick={() => handleEditClick(order)}>
+                                <Edit className="mr-1 h-3 w-3" /> Edit
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="destructive" size="sm">
+                                    <Trash2 className="mr-1 h-3 w-3" /> Delete
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will permanently delete the order for coupon #{order.studentId.split('-')[1]}. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => deleteOrder(order.id)}>
+                                      Yes, delete it
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </>
+                          )}
+                          {order.status === 'Ready' && (
+                             <Button variant="outline" size="sm" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
+                                <Undo2 className="mr-1 h-3 w-3" /> Back to Preparing
+                              </Button>
+                          )}
+                        </div>
+                      </div>
                       ))
                   ) : (
                       <p className="text-sm text-muted-foreground p-4 text-center">No orders in this state.</p>
@@ -48,6 +116,23 @@ export default function StaffDashboardPage() {
           })}
           </div>
       </div>
+       {editingOrder && (
+        <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Edit Coupon Number</AlertDialogTitle>
+              <AlertDialogDescription>
+                Enter the new coupon number for this order.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <EditCouponForm
+              currentCoupon={parseInt(editingOrder.studentId.split('-')[1] || '0')}
+              onSubmit={handleEditSubmit}
+              onCancel={() => setIsEditDialogOpen(false)}
+            />
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }
