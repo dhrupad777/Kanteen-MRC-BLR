@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const user = userCredential.user;
     
     const userRef = doc(db, "users", user.uid);
-    const isCustomer = !!profileData.name; // A customer will have a name.
+    const isCustomer = !!profileData.name;
     
     const dataToSet: UserProfile = {
       uid: user.uid,
@@ -70,9 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: isCustomer ? 'customer' : 'manager',
     };
     
-    // Only add customer-specific fields if the user is a customer
     if (isCustomer) {
-      dataToSet.subscriptions = [];
       dataToSet.dob = profileData.dob || undefined;
     }
     

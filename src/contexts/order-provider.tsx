@@ -24,11 +24,10 @@ interface OrderContextType {
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
-  const { user, userProfile } = useAuth();
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const prevOrdersRef = useRef<Order[]>([]);
-  
-  const notificationSubscriptions = userProfile?.subscriptions ?? [];
   const subscriptionsRef = useRef(notificationSubscriptions);
 
   useEffect(() => {
@@ -49,25 +48,17 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const toggleNotificationSubscription = useCallback((orderId: string) => {
-    if (!user) return;
-    
-    const userRef = doc(db, "users", user.uid);
-    const isSubscribed = subscriptionsRef.current.includes(orderId);
-
-    updateDoc(userRef, {
-      subscriptions: isSubscribed ? arrayRemove(orderId) : arrayUnion(orderId)
-    }).then(() => {
-       if (isSubscribed) {
-          toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-       } else {
-           toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
-       }
-    }).catch(error => {
-        console.error("Error updating subscriptions: ", error);
-        toast({ title: "Error", description: "Could not update your notification preferences.", variant: "destructive" });
+    setNotificationSubscriptions(prev => {
+        const isSubscribed = prev.includes(orderId);
+        if (isSubscribed) {
+            toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
+            return prev.filter(id => id !== orderId);
+        } else {
+            toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
+            return [...prev, orderId];
+        }
     });
-
-  }, [user, toast]);
+  }, [toast]);
 
 
   useEffect(() => {
@@ -90,12 +81,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
                 if (subscriptionsRef.current.includes(newOrder.id)) {
                     sendReadyNotification(newOrder);
-                    if (user) {
-                      const userRef = doc(db, "users", user.uid);
-                      updateDoc(userRef, {
-                        subscriptions: arrayRemove(newOrder.id)
-                      });
-                    }
+                    // No longer need to update firestore, but we can remove it from local state
+                     setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
                 }
             }
         });
@@ -113,7 +100,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification, user]);
+  }, [toast, sendReadyNotification]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
