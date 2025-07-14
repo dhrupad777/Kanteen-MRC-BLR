@@ -68,6 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       name: profileData.name || '',
       email: user.email || '',
       role: isCustomer ? 'customer' : 'manager',
+      subscriptions: [],
     };
     
     if (isCustomer) {
@@ -94,5 +95,3 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-    

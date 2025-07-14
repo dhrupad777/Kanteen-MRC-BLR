@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
-import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
+import { db, auth } from '@/lib/firebase';
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
 interface OrderContextType {
   orders: Order[];
@@ -16,6 +16,7 @@ interface OrderContextType {
   updateOrderCoupon: (orderId: string, newCouponId: string) => void;
   getOrdersByStudent: (studentId: string) => Order[];
   getOrdersByStatus: (status: OrderStatus) => Order[];
+  toggleNotificationSubscription: (couponId: string, subscribed: boolean) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -169,6 +170,35 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     return orders.filter(order => order.status === status);
   }, [orders]);
 
+ const toggleNotificationSubscription = useCallback(async (couponId: string, subscribed: boolean) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      toast({ title: "Not Logged In", description: "You must be logged in to manage notifications.", variant: "destructive" });
+      return;
+    }
+
+    const userProfileRef = doc(db, "users", currentUser.uid);
+
+    try {
+      if (subscribed) {
+        await updateDoc(userProfileRef, {
+          subscriptions: arrayUnion(couponId)
+        });
+      } else {
+        await updateDoc(userProfileRef, {
+          subscriptions: arrayRemove(couponId)
+        });
+      }
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast({
+        title: "Update Failed",
+        description: "Could not update your notification preferences. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
 
   const value = {
     orders,
@@ -178,6 +208,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     updateOrderCoupon,
     getOrdersByStudent,
     getOrdersByStatus,
+    toggleNotificationSubscription
   };
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
