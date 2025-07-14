@@ -52,7 +52,7 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
           transition={{ duration: 0.3 }}
           className={cn(
             "absolute -right-4 -top-6 w-24 h-24 opacity-0 group-hover/order:opacity-100 transition-opacity duration-300 pointer-events-none",
-            { "block": role === 'staff' }
+            { "hidden": role !== 'staff' }
           )}
         >
           <KanteenMascot state={order.status === 'Preparing' ? 'preparing' : 'ready'} />
