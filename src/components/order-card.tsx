@@ -4,8 +4,7 @@ import type { Order, OrderStatus } from "@/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderStatusBadge } from "./order-status-badge";
 import { Button } from "./ui/button";
-import { ArrowRight, Clock, Check } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { ArrowRight, Check } from "lucide-react";
 
 interface OrderCardProps {
   order: Order;
@@ -34,26 +33,15 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
   return (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card">
       <CardHeader>
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex-1">
-            <CardTitle className="font-headline text-xl mb-1">Coupon #{couponId}</CardTitle>
-            <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              <span>{formatDistanceToNow(order.createdAt, { addSuffix: true })}</span>
-            </div>
-          </div>
+        <div className="flex justify-end items-start gap-4">
           <OrderStatusBadge status={order.status} />
         </div>
       </CardHeader>
-      <CardContent className="flex-grow">
-        <ul className="space-y-2 text-sm">
-          {order.items.map((item, index) => (
-            <li key={index} className="flex justify-between items-center text-foreground">
-              <span>{item.name}</span>
-              <span className="font-mono text-xs bg-muted px-2 py-1 rounded-md">x{item.quantity}</span>
-            </li>
-          ))}
-        </ul>
+      <CardContent className="flex-grow flex flex-col justify-center items-center text-center p-4">
+        <div className="bg-muted/50 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 w-full">
+            <p className="text-sm font-semibold text-muted-foreground tracking-widest">COUPON</p>
+            <p className="font-headline font-bold text-5xl text-foreground tracking-tighter">{couponId}</p>
+        </div>
       </CardContent>
       {role === 'staff' && nextStatus && (
         <CardFooter className="p-3">

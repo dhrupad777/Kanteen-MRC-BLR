@@ -16,12 +16,12 @@ const statusConfig = {
   Preparing: {
     label: 'Preparing',
     icon: <ChefHat className="h-4 w-4" />,
-    className: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700',
+    className: 'bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-700',
   },
   Ready: {
     label: 'Ready for Pickup',
     icon: <CupSoda className="h-4 w-4" />,
-    className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700 animate-pulse',
+    className: 'bg-lime-200 text-lime-900 border-lime-400 dark:bg-lime-900/30 dark:text-lime-300 dark:border-lime-700 animate-pulse',
   },
   Completed: {
     label: 'Completed',
