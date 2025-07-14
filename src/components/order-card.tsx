@@ -37,7 +37,7 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
     <Card className={cn(
         "flex flex-col transition-all duration-300 w-full",
         {
-          "hover:shadow-xl hover:-translate-y-1 overflow-visible border-0": role === 'student',
+          "hover:shadow-xl hover:-translate-y-1 overflow-visible border-0 group/order": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         }
       )}>
@@ -49,14 +49,14 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
             "rounded-lg p-2 w-full font-bold tracking-wider",
             order.status === 'Preparing' && 'bg-blue-100/80 text-blue-900',
             order.status === 'Ready' && 'bg-green-100/80 text-green-900',
-            role === 'student' ? 'text-6xl p-6' : 'text-4xl px-6 py-4'
+            role === 'student' ? 'text-6xl p-6' : 'text-4xl px-4'
           )}>
             <p className="tabular-nums font-mono">{couponId}</p>
         </div>
       </CardContent>
       {role === 'staff' && nextStatus && (
         <CardFooter className="p-0 pl-1 pr-2 flex-grow">
-          <Button onClick={handleStatusUpdate} size="sm" className="bg-primary hover:bg-primary/90 transition-colors font-semibold h-8 text-xs hover:scale-105 transform duration-200 ease-in-out">
+          <Button onClick={handleStatusUpdate} size="sm" className="bg-primary hover:bg-primary/90 transition-colors font-semibold h-8 text-xs hover:scale-105 transform duration-200 ease-in-out px-2 py-1">
             {nextStatus === "Ready" ? <ArrowRight className="mr-1 h-3 w-3" /> : <Check className="mr-1 h-3 w-3" />}
             <span>{buttonText}</span>
           </Button>
