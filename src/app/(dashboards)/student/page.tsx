@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function StudentDashboardPage() {
-  const { orders } = useOrders();
+  const { orders, notificationSubscriptions, toggleNotificationSubscription } = useOrders();
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
 
   useEffect(() => {
@@ -28,6 +28,13 @@ export default function StudentDashboardPage() {
     setCurrentOrders(nonCompletedOrders);
   }, [orders]);
 
+  const handleToggleSubscription = (orderId: string) => {
+    if(Notification.permission !== 'granted') {
+        Notification.requestPermission();
+    }
+    toggleNotificationSubscription(orderId);
+  }
+
   const readyOrders = currentOrders.filter(o => o.status === 'Ready');
   const preparingOrders = currentOrders.filter(o => o.status === 'Preparing');
 
@@ -35,14 +42,14 @@ export default function StudentDashboardPage() {
     <div className="space-y-8">
        <div>
         <h1 className="font-headline text-3xl font-bold">Your Order Status</h1>
-        <p className="text-muted-foreground">Track the real-time status of your food order.</p>
+        <p className="text-muted-foreground">Track the real-time status of your food order. Press and hold a preparing coupon for 0.7s to get notified when it's ready.</p>
       </div>
 
       <DashboardSection 
         title="Ready to Collect" 
         icon={<CupSoda className="w-6 h-6 text-green-800"/>} 
         orders={readyOrders} 
-        emptyMessage="No orders are ready for pickup yet. You'll be notified!" 
+        emptyMessage="No orders are ready for pickup yet." 
         className="bg-green-100/60 dark:bg-green-900/30 border-green-300/20 dark:border-green-700/50"
       />
       
@@ -52,6 +59,9 @@ export default function StudentDashboardPage() {
         orders={preparingOrders} 
         emptyMessage="You have no orders being prepared." 
         className="bg-sky-100/60 dark:bg-sky-900/30 border-sky-300/20 dark:border-sky-700/50"
+        isPreparingSection
+        notificationSubscriptions={notificationSubscriptions}
+        onToggleSubscription={handleToggleSubscription}
       />
     </div>
   );
@@ -63,9 +73,12 @@ interface DashboardSectionProps {
     orders: Order[];
     emptyMessage: string;
     className?: string;
+    isPreparingSection?: boolean;
+    notificationSubscriptions?: string[];
+    onToggleSubscription?: (orderId: string) => void;
 }
 
-function DashboardSection({ title, icon, orders, emptyMessage, className }: DashboardSectionProps) {
+function DashboardSection({ title, icon, orders, emptyMessage, className, isPreparingSection = false, notificationSubscriptions, onToggleSubscription }: DashboardSectionProps) {
     return (
         <Card className={cn("border shadow-sm", className)}>
             <CardHeader>
@@ -79,7 +92,7 @@ function DashboardSection({ title, icon, orders, emptyMessage, className }: Dash
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <AnimatePresence>
                         {orders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
-                            <motion.div
+                             <motion.div
                                 key={order.id}
                                 layout
                                 initial={{ opacity: 0, scale: 0.9 }}
@@ -87,8 +100,36 @@ function DashboardSection({ title, icon, orders, emptyMessage, className }: Dash
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.4, ease: "easeOut" }}
                                 className="relative group"
+                                onContextMenu={(e) => e.preventDefault()}
+                                onPointerDown={(e) => {
+                                  // Prevent context menu on long press on touch devices
+                                  const target = e.target as HTMLElement;
+                                  target.style.touchAction = 'none';
+                                }}
+                                onPointerUp={(e) => {
+                                  const target = e.target as HTMLElement;
+                                  target.style.touchAction = 'auto';
+                                }}
+                                {...(isPreparingSection && onToggleSubscription ? {
+                                    onTap: () => {
+                                      // This is a short tap, you can add feedback if needed
+                                    },
+                                    onTapStart: (e) => {
+                                       e.currentTarget.setAttribute('data-long-press', 'true');
+                                    },
+                                    whileTap: { scale: 0.98 },
+                                    onLongPress: () => {
+                                       onToggleSubscription(order.id)
+                                    },
+                                } : {})}
                             >
-                                <OrderCard key={order.id} order={order} role="student" />
+                                <OrderCard 
+                                    key={order.id} 
+                                    order={order} 
+                                    role="student" 
+                                    showBell={isPreparingSection}
+                                    isSubscribed={isPreparingSection && notificationSubscriptions?.includes(order.id)}
+                                />
                             </motion.div>
                         ))}
                         </AnimatePresence>

@@ -10,10 +10,12 @@ import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTim
 
 interface OrderContextType {
   orders: Order[];
+  notificationSubscriptions: string[];
   addOrder: (couponId: string) => void;
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
   deleteOrder: (orderId: string) => void;
   updateOrderCoupon: (orderId: string, newCouponId: string) => void;
+  toggleNotificationSubscription: (orderId: string) => void;
   getOrdersByStudent: (studentId: string) => Order[];
   getOrdersByStatus: (status: OrderStatus) => Order[];
 }
@@ -22,6 +24,7 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const { toast } = useToast();
   const previousOrdersRef = useRef<Order[]>([]);
 
@@ -39,6 +42,19 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   }, []);
+
+  const toggleNotificationSubscription = useCallback((orderId: string) => {
+    setNotificationSubscriptions(prev => {
+        const isSubscribed = prev.includes(orderId);
+        if(isSubscribed) {
+            toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
+            return prev.filter(id => id !== orderId);
+        } else {
+            toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
+            return [...prev, orderId];
+        }
+    });
+  }, [toast]);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
@@ -59,8 +75,11 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       
       ordersData.forEach(newOrder => {
         const oldOrder = previousOrders.find(o => o.id === newOrder.id);
-        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing') {
+        // Check if the order status changed to 'Ready' and the user is subscribed
+        if (newOrder.status === 'Ready' && oldOrder?.status === 'Preparing' && notificationSubscriptions.includes(newOrder.id)) {
           sendReadyNotification(newOrder);
+          // Unsubscribe after sending notification to prevent duplicates
+          setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
         }
       });
       
@@ -76,7 +95,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast, sendReadyNotification]);
+  }, [toast, sendReadyNotification, notificationSubscriptions]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
@@ -194,10 +213,12 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     orders,
+    notificationSubscriptions,
     addOrder,
     updateOrderStatus,
     deleteOrder,
     updateOrderCoupon,
+    toggleNotificationSubscription,
     getOrdersByStudent,
     getOrdersByStatus,
   };
