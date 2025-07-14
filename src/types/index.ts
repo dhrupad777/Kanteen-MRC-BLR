@@ -15,4 +15,5 @@ export interface UserProfile {
     email: string;
     dob?: string;
     role: 'customer' | 'manager';
+    subscriptions?: string[];
 }

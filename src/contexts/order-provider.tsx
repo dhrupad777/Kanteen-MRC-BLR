@@ -6,7 +6,8 @@ import React, { createContext, useCallback, useContext, useState, useEffect, use
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { useAuth } from "@/hooks/use-auth";
 
 interface OrderContextType {
   orders: Order[];
@@ -24,6 +25,7 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const { user, userProfile } = useAuth();
   const [notificationSubscriptions, setNotificationSubscriptions] = useState<string[]>([]);
   const prevOrdersRef = useRef<Order[]>([]);
   const subscriptionsRef = useRef(notificationSubscriptions);
@@ -31,6 +33,14 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     subscriptionsRef.current = notificationSubscriptions;
   }, [notificationSubscriptions]);
+
+  useEffect(() => {
+    if (userProfile && userProfile.subscriptions) {
+      setNotificationSubscriptions(userProfile.subscriptions);
+    } else {
+      setNotificationSubscriptions([]);
+    }
+  }, [userProfile]);
 
   const { toast } = useToast();
 
@@ -45,18 +55,28 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const toggleNotificationSubscription = useCallback((orderId: string) => {
-    const isSubscribed = notificationSubscriptions.includes(orderId);
-    
-    if (isSubscribed) {
-      setNotificationSubscriptions(prev => prev.filter(id => id !== orderId));
-      toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
-    } else {
-      setNotificationSubscriptions(prev => [...prev, orderId]);
-      toast({ title: "Notifications On", description: "You'll be notified when this order is ready."});
+  const toggleNotificationSubscription = useCallback(async (orderId: string) => {
+    if (!user) {
+      toast({ title: "Please log in", description: "You must be logged in to manage notifications.", variant: "destructive" });
+      return;
     }
-  }, [notificationSubscriptions, toast]);
 
+    const userDocRef = doc(db, "users", user.uid);
+    const isSubscribed = notificationSubscriptions.includes(orderId);
+
+    try {
+      if (isSubscribed) {
+        await updateDoc(userDocRef, { subscriptions: arrayRemove(orderId) });
+        toast({ title: "Notifications Off", description: "You won't receive a notification for this order." });
+      } else {
+        await updateDoc(userDocRef, { subscriptions: arrayUnion(orderId) });
+        toast({ title: "Notifications On", description: "You'll be notified when this order is ready." });
+      }
+    } catch (error) {
+      console.error("Error updating notification subscription:", error);
+      toast({ title: "Error", description: "Could not update your notification preferences.", variant: "destructive" });
+    }
+  }, [user, notificationSubscriptions, toast]);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
@@ -78,7 +98,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             if (oldOrder && oldOrder.status === 'Preparing' && newOrder.status === 'Ready') {
                 if (subscriptionsRef.current.includes(newOrder.id)) {
                     sendReadyNotification(newOrder);
-                    setNotificationSubscriptions(prev => prev.filter(id => id !== newOrder.id));
                 }
             }
         });

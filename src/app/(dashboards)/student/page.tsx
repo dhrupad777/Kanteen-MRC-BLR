@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 export default function StudentDashboardPage() {
   const { orders, notificationSubscriptions, toggleNotificationSubscription } = useOrders();
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
-  const { user, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
