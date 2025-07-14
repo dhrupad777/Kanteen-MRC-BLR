@@ -1,3 +1,4 @@
+
 export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Completed' | 'Archived';
 
 export interface Order {
@@ -6,4 +7,10 @@ export interface Order {
   items: { name: string; quantity: number }[];
   status: OrderStatus;
   createdAt: Date;
+}
+
+export interface UserProfile {
+    uid: string;
+    name: string;
+    phone: string;
 }

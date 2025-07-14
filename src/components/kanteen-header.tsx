@@ -5,10 +5,11 @@ import { ChefHat, LogOut } from "lucide-react"
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from "./ui/button"
 import { useAuth } from "@/hooks/use-auth"
+import { UserProfile } from "@/types"
 
 export function KanteenHeader() {
   const pathname = usePathname();
-  const { user, signOutUser } = useAuth();
+  const { user, userProfile, signOutUser } = useAuth();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -18,7 +19,11 @@ export function KanteenHeader() {
 
   const isDashboard = pathname.startsWith('/student') || pathname.startsWith('/staff');
   const isStaffPage = pathname.startsWith('/staff');
-  const isLoginPage = pathname.startsWith('/login');
+  
+  const getFirstName = (profile: UserProfile | null) => {
+    if (!profile || !profile.name) return '';
+    return profile.name.split(' ')[0];
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
@@ -28,7 +33,12 @@ export function KanteenHeader() {
           <span className="font-headline text-2xl font-bold text-foreground">Kanteen</span>
         </Link>
         
-        <div className="flex-1 flex justify-end">
+        <div className="flex-1 flex items-center justify-end gap-4">
+           {isStaffPage && userProfile && (
+            <span className="text-sm text-muted-foreground hidden sm:block">
+              Welcome, {getFirstName(userProfile)}!
+            </span>
+          )}
           {isDashboard && !isStaffPage && (
              <Button asChild variant="ghost">
                <Link href="/">

@@ -3,13 +3,17 @@
 
 import type { ReactNode } from "react";
 import React, { createContext, useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { auth, db } from '@/lib/firebase';
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import type { UserProfile } from "@/types";
 
 interface AuthContextType {
   user: User | null;
+  userProfile: UserProfile | null;
   loading: boolean;
   signInWithEmail: (email: string, password: string) => Promise<any>;
+  signUpWithEmail: (email: string, password: string, profileData: Omit<UserProfile, 'uid'>) => Promise<any>;
   signOutUser: () => Promise<void>;
 }
 
@@ -17,11 +21,26 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const userRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setUserProfile(docSnap.data() as UserProfile);
+        } else {
+          setUserProfile(null);
+        }
+      } else {
+        // User is signed out
+        setUserProfile(null);
+      }
       setLoading(false);
     });
 
@@ -32,14 +51,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  const signUpWithEmail = async (email: string, password: string, profileData: Omit<UserProfile, 'uid'>) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    // Now store the additional profile information in Firestore
+    const userRef = doc(db, "users", user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      ...profileData,
+    });
+    return userCredential;
+  }
+
   const signOutUser = () => {
     return signOut(auth);
   };
 
   const value = {
     user,
+    userProfile,
     loading,
     signInWithEmail,
+    signUpWithEmail,
     signOutUser,
   };
 

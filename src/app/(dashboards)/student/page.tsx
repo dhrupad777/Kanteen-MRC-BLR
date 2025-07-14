@@ -89,6 +89,9 @@ function DashboardSection({ title, icon, orders, emptyMessage, className, isPrep
     const handlePointerDown = (orderId: string) => {
       pressTimer.current = setTimeout(() => {
         if (onToggleSubscription) {
+          if (navigator.vibrate) {
+            navigator.vibrate(50); // Haptic feedback
+          }
           onToggleSubscription(orderId);
         }
       }, 700);

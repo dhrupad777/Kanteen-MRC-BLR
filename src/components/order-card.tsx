@@ -42,7 +42,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
           "hover:shadow-xl hover:-translate-y-1 overflow-visible border-0 group/order": role === 'student',
           "flex-row items-center p-0": role === 'staff',
         },
-        isSubscribed && 'bg-gradient-to-br from-blue-100/80 to-purple-100/80 dark:from-blue-900/30 dark:to-purple-900/30'
+        isSubscribed && 'bg-gradient-to-br from-blue-200/80 to-purple-200/80 dark:from-blue-900/50 dark:to-purple-900/50'
       )}>
        {role === 'student' && showBell && (
         <div className="absolute top-2 right-2 text-primary/70">
@@ -57,7 +57,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
             "rounded-lg p-2 w-full font-bold font-mono tabular-nums tracking-wider",
             order.status === 'Preparing' && 'bg-blue-100/80 text-blue-900',
             order.status === 'Ready' && 'bg-green-100/80 text-green-900',
-            role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4'
+            role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2'
           )}>
             <p className="font-mono tabular-nums">{couponId}</p>
         </div>

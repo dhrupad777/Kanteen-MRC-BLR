@@ -89,7 +89,8 @@ export default function StaffDashboardPage() {
                   </h2>
                   <div className="space-y-3">
                   <AnimatePresence>
-                  {columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
+                  {columnOrders.length > 0 ? (
+                    columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
                       <motion.div 
                         key={order.id} 
                         layout 
@@ -97,7 +98,7 @@ export default function StaffDashboardPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex items-center gap-2 group/order"
+                        className="flex items-center gap-2"
                       >
                         <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
                         <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
@@ -139,7 +140,7 @@ export default function StaffDashboardPage() {
                         </div>
                       </motion.div>
                       ))
-                  }
+                  ) : null }
                   </AnimatePresence>
                   </div>
               </div>
