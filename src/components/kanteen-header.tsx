@@ -47,14 +47,6 @@ export function KanteenHeader() {
             </span>
           )}
 
-          {isDashboard && (
-             <Button asChild variant="outline" size="sm">
-               <Link href="/">
-                 Switch Role
-               </Link>
-             </Button>
-          )}
-
           {user && (
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
