@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Ticket } from 'lucide-react';
+import { Ticket, PlusCircle } from 'lucide-react';
 
 const formSchema = z.object({
   couponId: z.coerce
@@ -34,11 +34,11 @@ export function CouponEntryForm() {
   }
 
   return (
-    <Card>
+    <Card className="bg-secondary/40 border-0">
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center gap-2">
             <Ticket className="text-primary"/>
-            Enter Coupon
+            Create New Order
         </CardTitle>
         <CardDescription>Enter a coupon number (1-200) to add an order to the 'Preparing' queue.</CardDescription>
       </CardHeader>
@@ -52,13 +52,16 @@ export function CouponEntryForm() {
                 <FormItem className="flex-grow">
                   <FormLabel>Coupon Number</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g. 42" {...field} value={field.value ?? ''} />
+                    <Input type="number" placeholder="e.g. 42" {...field} value={field.value ?? ''} className="bg-background"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Add Order</Button>
+            <Button type="submit" size="lg">
+              <PlusCircle />
+              Add Order
+            </Button>
           </form>
         </Form>
       </CardContent>

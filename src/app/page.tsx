@@ -8,13 +8,13 @@ export default function RoleSelectionPage() {
   return (
     <>
     <KanteenHeader />
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 -mt-16">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 -mt-20">
       <header className="text-center mb-12">
-        <h1 className="font-headline text-5xl md:text-7xl font-bold text-primary">
+        <h1 className="font-headline text-5xl md:text-7xl font-bold text-primary tracking-tighter">
           Kanteen
         </h1>
-        <p className="text-muted-foreground text-lg mt-2">
-          Your Campus Canteen Companion
+        <p className="text-muted-foreground text-lg mt-2 max-w-md">
+          Your Campus Canteen Companion. Select your role to get started.
         </p>
       </header>
 
@@ -22,17 +22,17 @@ export default function RoleSelectionPage() {
         <RoleCard
           href="/student"
           icon={<User className="w-12 h-12 text-primary" />}
-          title="Log in as Customer"
+          title="Customer"
           description="View your order status and get notified when it's ready."
         />
         <RoleCard
           href="/staff"
           icon={<UtensilsCrossed className="w-12 h-12 text-primary" />}
-          title="Log in as Order Manager"
+          title="Order Manager"
           description="Manage orders by coupon and get kitchen insights."
         />
       </main>
-      <footer className="mt-16 text-center text-muted-foreground text-sm">
+      <footer className="mt-20 text-center text-muted-foreground text-sm">
         <p>&copy; {new Date().getFullYear()} Kanteen. All rights reserved.</p>
       </footer>
     </div>
@@ -50,14 +50,14 @@ interface RoleCardProps {
 function RoleCard({ href, icon, title, description }: RoleCardProps) {
   return (
     <Link href={href} className="group">
-      <Card className="h-full hover:shadow-xl hover:-translate-y-2 transition-transform duration-300 ease-in-out border-2 border-transparent hover:border-primary">
+      <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm">
         <CardHeader className="flex flex-col items-center text-center">
-          <div className="p-4 bg-secondary rounded-full mb-4">{icon}</div>
+          <div className="p-4 bg-primary/10 rounded-full mb-4">{icon}</div>
           <CardTitle className="font-headline text-3xl">{title}</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-muted-foreground mb-6 h-12">{description}</p>
-          <Button variant="ghost" className="text-primary group-hover:text-accent font-bold">
+          <Button variant="ghost" className="text-primary group-hover:text-accent font-semibold text-base">
             Go to Dashboard <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
         </CardContent>

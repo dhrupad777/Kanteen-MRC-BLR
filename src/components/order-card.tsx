@@ -32,10 +32,10 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
   const couponId = order.studentId.split('-')[1] || order.id;
 
   return (
-    <Card className="flex flex-col h-full transition-shadow duration-300 hover:shadow-lg">
+    <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card">
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1">
             <CardTitle className="font-headline text-xl mb-1">Coupon #{couponId}</CardTitle>
             <div className="text-sm text-muted-foreground flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
@@ -46,21 +46,20 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
-        <ul className="space-y-2">
+        <ul className="space-y-2 text-sm">
           {order.items.map((item, index) => (
             <li key={index} className="flex justify-between items-center text-foreground">
               <span>{item.name}</span>
-              <span className="font-mono text-sm bg-muted px-2 py-0.5 rounded-md">x{item.quantity}</span>
+              <span className="font-mono text-xs bg-muted px-2 py-1 rounded-md">x{item.quantity}</span>
             </li>
           ))}
         </ul>
       </CardContent>
       {role === 'staff' && nextStatus && (
-        <CardFooter>
-          <Button onClick={handleStatusUpdate} className="w-full bg-primary hover:bg-accent transition-colors">
-            {nextStatus === "Completed" ? <Check className="mr-2 h-4 w-4" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+        <CardFooter className="p-3">
+          <Button onClick={handleStatusUpdate} className="w-full bg-primary hover:bg-accent transition-colors font-semibold">
+            {nextStatus === "Ready" ? <ArrowRight className="mr-2 h-4 w-4" /> : <Check className="mr-2 h-4 w-4" />}
             <span>Mark as {nextStatus}</span>
-            {nextStatus !== "Completed" && <ArrowRight className="ml-2 h-4 w-4" />}
           </Button>
         </CardFooter>
       )}

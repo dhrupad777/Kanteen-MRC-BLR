@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { Order, OrderStatus } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
@@ -20,57 +20,59 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const { toast } = useToast();
+  const previousOrdersRef = useRef<Order[]>([]);
 
   useEffect(() => {
-    const q = query(collection(db, "orders"), where("status", "!=", "Archived"));
+    previousOrdersRef.current = orders;
+  }, [orders]);
+
+  useEffect(() => {
+    const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const ordersData: Order[] = [];
-      let latestReadyOrder: Order | null = null;
-
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const order: Order = {
+        ordersData.push({
           id: doc.id,
           studentId: data.studentId,
           items: data.items,
           status: data.status,
           createdAt: (data.createdAt as Timestamp).toDate(),
-        };
-        ordersData.push(order);
-        
-        const oldOrder = orders.find(o => o.id === order.id);
-        if (oldOrder && oldOrder.status !== 'Ready' && order.status === 'Ready') {
-            latestReadyOrder = order;
-        }
+        });
       });
 
-      setOrders(ordersData.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()));
+      const previousOrders = previousOrdersRef.current;
+      const justReadyOrder = ordersData.find(newOrder => {
+          const oldOrder = previousOrders.find(o => o.id === newOrder.id);
+          return newOrder.status === 'Ready' && oldOrder?.status === 'Preparing';
+      });
+      
+      setOrders(ordersData);
 
-      if (latestReadyOrder) {
+      if (justReadyOrder) {
         toast({
             title: "Order Ready!",
-            description: `Order for coupon ${latestReadyOrder.studentId.split('-')[1]} is now ready for pickup.`,
+            description: `Order for coupon #${justReadyOrder.studentId.split('-')[1]} is now ready for pickup.`,
         });
         if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
              new Notification('Kanteen Order Ready!', {
-              body: `Your order for coupon ${latestReadyOrder.studentId.split('-')[1]} is ready for pickup.`,
+              body: `Your order for coupon #${justReadyOrder.studentId.split('-')[1]} is ready for pickup.`,
+              icon: '/favicon.ico'
             });
         }
       }
     });
 
     return () => unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Pass `orders` to compare old and new state for notifications
+  }, [toast]);
 
 
   const addOrder = useCallback(async (couponId: string) => {
-    // Check if an active order for this coupon already exists
-     const activeOrder = orders.find(o => o.studentId === `student-${couponId}` && o.status !== 'Completed');
+    const activeOrder = orders.find(o => o.studentId === `student-${couponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
       if (activeOrder) {
         toast({
-          title: "Coupon Already In Progress",
-          description: `Coupon ${couponId} is already in the Preparing or Ready queue.`,
+          title: "Coupon In Use",
+          description: `Coupon #${couponId} is already in the queue.`,
           variant: "destructive"
         })
         return;
@@ -83,6 +85,10 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         status: 'Preparing',
         createdAt: serverTimestamp(),
       });
+      toast({
+        title: "Order Added",
+        description: `Coupon #${couponId} is now in the 'Preparing' queue.`,
+      })
     } catch (error) {
         console.error("Error adding document: ", error);
         toast({
