@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Undo2 } from 'lucide-react';
 import { EditCouponForm } from '@/components/edit-coupon-form';
+import { AnimatePresence, motion } from 'framer-motion';
 
 
 export default function StaffDashboardPage() {
@@ -66,9 +68,18 @@ export default function StaffDashboardPage() {
                     {column.title} ({columnOrders.length})
                   </h2>
                   <div className="space-y-3">
+                  <AnimatePresence>
                   {columnOrders.length > 0 ? (
                       columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
-                      <div key={order.id} className="flex items-center gap-2">
+                      <motion.div 
+                        key={order.id} 
+                        layout 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="flex items-center gap-2"
+                      >
                         <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
                         <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
                           {order.status === 'Preparing' && (
@@ -107,11 +118,12 @@ export default function StaffDashboardPage() {
                               </Button>
                           )}
                         </div>
-                      </div>
+                      </motion.div>
                       ))
                   ) : (
                       <p className="text-sm text-muted-foreground p-4 text-center">No orders in this state.</p>
                   )}
+                  </AnimatePresence>
                   </div>
               </div>
               );

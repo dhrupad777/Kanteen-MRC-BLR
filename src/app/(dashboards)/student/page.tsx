@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -7,6 +8,7 @@ import { Order } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CupSoda, CookingPot } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function StudentDashboardPage() {
   const { orders } = useOrders();
@@ -74,7 +76,20 @@ function DashboardSection({ title, icon, orders, emptyMessage, className }: Dash
             <CardContent>
                 {orders.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {orders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => <OrderCard key={order.id} order={order} role="student" />)}
+                        <AnimatePresence>
+                        {orders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
+                            <motion.div
+                                key={order.id}
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.4, ease: "easeOut" }}
+                            >
+                                <OrderCard key={order.id} order={order} role="student" />
+                            </motion.div>
+                        ))}
+                        </AnimatePresence>
                     </div>
                 ) : (
                     <p className="text-muted-foreground">{emptyMessage}</p>

@@ -1,8 +1,11 @@
+
 import Link from 'next/link';
 import { User, UtensilsCrossed } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KanteenHeader } from '@/components/kanteen-header';
+import { motion } from 'framer-motion';
+
 
 export default function RoleSelectionPage() {
   return (
@@ -52,7 +55,7 @@ function RoleCard({ href, icon, title, description }: RoleCardProps) {
     <Link href={href} className="group block">
       <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm p-4">
         <CardHeader className="flex flex-col items-center text-center">
-          <div className="p-4 bg-primary/10 rounded-full mb-4">{icon}</div>
+          <div className="p-4 bg-primary/10 rounded-full mb-4 transition-colors duration-300 group-hover:bg-primary/20">{icon}</div>
           <CardTitle className="font-headline text-3xl">{title}</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
@@ -62,3 +65,4 @@ function RoleCard({ href, icon, title, description }: RoleCardProps) {
     </Link>
   );
 }
+
