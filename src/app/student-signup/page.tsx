@@ -26,15 +26,21 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { KanteenHeader } from '@/components/kanteen-header';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CalendarIcon } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
+  dob: z.date({
+    required_error: "A date of birth is required.",
+  }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
@@ -48,7 +54,6 @@ export default function StudentSignUpPage() {
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
       password: "",
     },
   });
@@ -64,7 +69,7 @@ export default function StudentSignUpPage() {
     try {
       await signUpWithEmail(values.email, values.password, {
         name: values.name,
-        phone: values.phone,
+        dob: format(values.dob, 'yyyy-MM-dd'),
       });
       router.push('/student');
     } catch (error: any) {
@@ -91,7 +96,7 @@ export default function StudentSignUpPage() {
   return (
     <>
       <KanteenHeader/>
-      <div className="flex items-center justify-center min-h-screen bg-background -mt-20">
+      <div className="flex items-center justify-center min-h-screen bg-background -mt-20 py-10">
         <Card className="mx-auto max-w-sm w-full">
           <CardHeader>
             <CardTitle className="text-2xl font-headline">Create Customer Account</CardTitle>
@@ -130,13 +135,41 @@ export default function StudentSignUpPage() {
                 />
                 <FormField
                   control={form.control}
-                  name="phone"
+                  name="dob"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input type="tel" placeholder="123-456-7890" {...field} />
-                      </FormControl>
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Date of birth</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
