@@ -32,11 +32,13 @@ import { AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 const formSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
+  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
-export default function SignUpPage() {
+export default function StudentSignUpPage() {
   const { user, signUpWithEmail, loading } = useAuth();
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
@@ -44,22 +46,27 @@ export default function SignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
+      phone: "",
       password: "",
     },
   });
 
   useEffect(() => {
     if (user) {
-      router.push('/staff');
+      router.push('/student');
     }
   }, [user, router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setAuthError(null);
     try {
-      await signUpWithEmail(values.email, values.password, {});
-      router.push('/staff');
+      await signUpWithEmail(values.email, values.password, {
+        name: values.name,
+        phone: values.phone,
+      });
+      router.push('/student');
     } catch (error: any) {
         if (error.code === 'auth/email-already-in-use') {
             setAuthError("This email address is already in use.");
@@ -87,14 +94,27 @@ export default function SignUpPage() {
       <div className="flex items-center justify-center min-h-screen bg-background -mt-20">
         <Card className="mx-auto max-w-sm w-full">
           <CardHeader>
-            <CardTitle className="text-2xl font-headline">Create Manager Account</CardTitle>
+            <CardTitle className="text-2xl font-headline">Create Customer Account</CardTitle>
             <CardDescription>
-              Enter your details below to create your manager account.
+              Enter your details below to track your orders.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                  <FormField
                   control={form.control}
                   name="email"
@@ -102,7 +122,20 @@ export default function SignUpPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="manager@kanteen.com" {...field} />
+                        <Input placeholder="customer@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="123-456-7890" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -138,7 +171,7 @@ export default function SignUpPage() {
            <CardFooter className="text-center text-sm">
              <p className="w-full">
               Already have an account?{" "}
-              <Link href="/login" className="underline text-primary hover:text-primary/80">
+              <Link href="/student-login" className="underline text-primary hover:text-primary/80">
                 Log in
               </Link>
              </p>

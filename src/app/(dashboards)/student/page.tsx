@@ -6,13 +6,26 @@ import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CupSoda, CookingPot } from 'lucide-react';
+import { CupSoda, CookingPot, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+
 
 export default function StudentDashboardPage() {
   const { orders, notificationSubscriptions, toggleNotificationSubscription } = useOrders();
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/student-login');
+    }
+  }, [user, loading, router]);
+
 
   useEffect(() => {
     // Request notification permission as soon as the component mounts
@@ -42,6 +55,14 @@ export default function StudentDashboardPage() {
 
   const readyOrders = currentOrders.filter(o => o.status === 'Ready');
   const preparingOrders = currentOrders.filter(o => o.status === 'Preparing');
+
+  if (loading || !user) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

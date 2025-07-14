@@ -1,7 +1,7 @@
 
 "use client"
 import Link from "next/link"
-import { ChefHat, LogOut } from "lucide-react"
+import { ChefHat, LogOut, User } from "lucide-react"
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from "./ui/button"
 import { useAuth } from "@/hooks/use-auth"
@@ -14,11 +14,19 @@ export function KanteenHeader() {
 
   const handleSignOut = async () => {
     await signOutUser();
-    router.push('/login');
+    // Determine where to redirect after sign out
+    if (pathname.startsWith('/staff')) {
+        router.push('/login');
+    } else if (pathname.startsWith('/student')) {
+        router.push('/student-login');
+    } else {
+        router.push('/');
+    }
   }
 
   const isDashboard = pathname.startsWith('/student') || pathname.startsWith('/staff');
   const isStaffPage = pathname.startsWith('/staff');
+  const isStudentPage = pathname.startsWith('/student');
   
   const getFirstName = (profile: UserProfile | null) => {
     if (!profile || !profile.name) return '';
@@ -34,12 +42,13 @@ export function KanteenHeader() {
         </Link>
         
         <div className="flex-1 flex items-center justify-end gap-4">
-           {isStaffPage && userProfile && (
+           {isStudentPage && userProfile && (
             <span className="text-sm text-muted-foreground hidden sm:block">
               Welcome, {getFirstName(userProfile)}!
             </span>
           )}
-          {isDashboard && !isStaffPage && (
+
+          {isDashboard && (
              <Button asChild variant="ghost">
                <Link href="/">
                  <LogOut className="mr-2 h-4 w-4" />
@@ -47,7 +56,8 @@ export function KanteenHeader() {
                </Link>
              </Button>
           )}
-          {isStaffPage && user && (
+
+          {user && (
             <Button variant="ghost" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout

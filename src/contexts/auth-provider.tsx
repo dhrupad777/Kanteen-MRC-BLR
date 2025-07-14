@@ -3,9 +3,9 @@
 
 import type { ReactNode } from "react";
 import React, { createContext, useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
 import type { UserProfile } from "@/types";
 
 interface AuthContextType {
@@ -13,7 +13,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   signInWithEmail: (email: string, password: string) => Promise<any>;
-  signUpWithEmail: (email: string, password: string, profileData: Omit<UserProfile, 'uid'>) => Promise<any>;
+  signUpWithEmail: (email: string, password: string, profileData: Partial<Omit<UserProfile, 'uid'>>) => Promise<any>;
   signOutUser: () => Promise<void>;
 }
 
@@ -25,41 +25,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          setUserProfile(docSnap.data() as UserProfile);
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+        if (user) {
+            setUser(user);
+            const userRef = doc(db, "users", user.uid);
+            const unsubscribeFirestore = onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    setUserProfile(docSnap.data() as UserProfile);
+                } else {
+                    setUserProfile(null);
+                }
+                setLoading(false);
+            }, () => {
+                setUserProfile(null);
+                setLoading(false);
+            });
+            // Cleanup firestore listener on user change
+            return () => unsubscribeFirestore();
         } else {
-          setUserProfile(null);
+            setUser(null);
+            setUserProfile(null);
+            setLoading(false);
         }
-      } else {
-        // User is signed out
-        setUserProfile(null);
-      }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => unsubscribeAuth();
   }, []);
 
   const signInWithEmail = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signUpWithEmail = async (email: string, password: string, profileData: Omit<UserProfile, 'uid'>) => {
+  const signUpWithEmail = async (email: string, password: string, profileData: Partial<Omit<UserProfile, 'uid'>>) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    // Now store the additional profile information in Firestore
+    
     const userRef = doc(db, "users", user.uid);
-    await setDoc(userRef, {
+    const dataToSet: UserProfile = {
       uid: user.uid,
-      ...profileData,
-    });
+      name: profileData.name || '',
+      email: user.email || '',
+      phone: profileData.phone || '', // Keep phone if provided, otherwise empty
+      role: profileData.name && profileData.phone ? 'customer' : 'manager',
+    };
+    await setDoc(userRef, dataToSet);
+
     return userCredential;
   }
 

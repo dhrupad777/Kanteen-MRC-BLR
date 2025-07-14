@@ -36,8 +36,8 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
-export default function SignUpPage() {
-  const { user, signUpWithEmail, loading } = useAuth();
+export default function StudentLoginPage() {
+  const { user, signInWithEmail, loading } = useAuth();
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -51,26 +51,22 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/staff');
+      router.push('/student');
     }
   }, [user, router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setAuthError(null);
     try {
-      await signUpWithEmail(values.email, values.password, {});
-      router.push('/staff');
+      await signInWithEmail(values.email, values.password);
+      router.push('/student');
     } catch (error: any) {
-        if (error.code === 'auth/email-already-in-use') {
-            setAuthError("This email address is already in use.");
-        } else {
-            setAuthError("An unexpected error occurred. Please try again.");
-        }
+        setAuthError("Invalid email or password. Please try again.");
         console.error("Authentication Error:", error);
     }
   }
 
-  if (loading || user) {
+    if (loading || user) {
     return (
       <div className="flex flex-col min-h-screen">
          <KanteenHeader/>
@@ -87,22 +83,22 @@ export default function SignUpPage() {
       <div className="flex items-center justify-center min-h-screen bg-background -mt-20">
         <Card className="mx-auto max-w-sm w-full">
           <CardHeader>
-            <CardTitle className="text-2xl font-headline">Create Manager Account</CardTitle>
+            <CardTitle className="text-2xl font-headline">Customer Login</CardTitle>
             <CardDescription>
-              Enter your details below to create your manager account.
+              Enter your credentials to access your order dashboard.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                 <FormField
+                <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="manager@kanteen.com" {...field} />
+                        <Input placeholder="customer@email.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -124,24 +120,24 @@ export default function SignUpPage() {
                  {authError && (
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>Sign-up Failed</AlertTitle>
+                        <AlertTitle>Login Failed</AlertTitle>
                         <AlertDescription>{authError}</AlertDescription>
                     </Alert>
                 )}
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create Account
+                  Login
                 </Button>
               </form>
             </Form>
           </CardContent>
            <CardFooter className="text-center text-sm">
-             <p className="w-full">
-              Already have an account?{" "}
-              <Link href="/login" className="underline text-primary hover:text-primary/80">
-                Log in
+            <p className="w-full">
+              Don&apos;t have an account?{" "}
+              <Link href="/student-signup" className="underline text-primary hover:text-primary/80">
+                Sign up
               </Link>
-             </p>
+            </p>
           </CardFooter>
         </Card>
       </div>
