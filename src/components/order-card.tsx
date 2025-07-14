@@ -14,8 +14,6 @@ interface OrderCardProps {
   showBell?: boolean;
   isSubscribed?: boolean;
   onToggleSubscription?: (orderId: string) => void;
-  isSelected?: boolean;
-  isBatchMode?: boolean;
 }
 
 const statusProgression: Record<string, OrderStatus | null> = {
@@ -25,7 +23,7 @@ const statusProgression: Record<string, OrderStatus | null> = {
   Completed: null,
 };
 
-export function OrderCard({ order, role, onStatusChange, showBell = false, isSubscribed = false, onToggleSubscription, isSelected, isBatchMode }: OrderCardProps) {
+export function OrderCard({ order, role, onStatusChange, showBell = false, isSubscribed = false, onToggleSubscription }: OrderCardProps) {
   const nextStatus = statusProgression[order.status];
   
   const couponId = order.studentId.split('-')[1] || order.id;
@@ -38,16 +36,10 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
     }
   };
 
-  const handleCardClick = () => {
-    if (isBatchMode && onToggleSubscription) {
-        onToggleSubscription(order.id);
-    }
-  };
-
   const handleBellClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // prevent card click handler when in batch mode
-    if (!isBatchMode && onToggleSubscription) {
-        onToggleSubscription(order.id);
+    e.stopPropagation();
+    if (onToggleSubscription) {
+      onToggleSubscription(order.id);
     }
   };
 
@@ -58,16 +50,13 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
         {
           "overflow-hidden border-0": role === 'student',
           "flex-row items-center p-0": role === 'staff',
-          "cursor-pointer": isBatchMode
         }
       )}
-      onClick={handleCardClick}
     >
       {role === 'student' && showBell && (
         <button
           onClick={handleBellClick}
-          disabled={isBatchMode}
-          className="absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="absolute top-2 right-2 z-10 p-2 rounded-full hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-white/50"
           aria-label={isSubscribed ? "Unsubscribe from notifications" : "Subscribe to notifications"}
         >
           {isSubscribed 
@@ -84,7 +73,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
             "rounded-lg p-2 w-full font-bold tracking-wider transition-colors duration-300",
             role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4 py-2',
             {
-              'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing',
+              'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing' && !isSubscribed,
               'bg-blue-800 dark:bg-blue-700 text-white': order.status === 'Preparing' && isSubscribed,
               'bg-green-200/90 dark:bg-green-900/50 text-green-900 dark:text-green-200': order.status === 'Ready',
             }

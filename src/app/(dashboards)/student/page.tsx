@@ -1,25 +1,22 @@
 
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CupSoda, CookingPot, Loader2, Bell, BellOff } from 'lucide-react';
+import { CupSoda, CookingPot, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 
 export default function StudentDashboardPage() {
   const { orders, notificationSubscriptions, toggleNotificationSubscription } = useOrders();
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [selectedCoupons, setSelectedCoupons] = useState<string[]>([]);
-  const [isBatchMode, setIsBatchMode] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -41,54 +38,14 @@ export default function StudentDashboardPage() {
   }, [orders]);
 
   const handleToggleSubscription = (orderId: string) => {
-    if (isBatchMode) {
-      setSelectedCoupons(prev => 
-        prev.includes(orderId) 
-          ? prev.filter(id => id !== orderId) 
-          : [...prev, orderId]
-      );
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          toggleNotificationSubscription(orderId);
+        }
+      });
     } else {
-      if (Notification.permission !== 'granted') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            toggleNotificationSubscription(orderId);
-          }
-        });
-      } else {
-        toggleNotificationSubscription(orderId);
-      }
-    }
-  }
-
-  const handleBatchToggle = () => {
-    if (isBatchMode && selectedCoupons.length > 0) {
-      if (Notification.permission !== 'granted') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            selectedCoupons.forEach(orderId => {
-              // We only toggle if the current state is different
-              if (!notificationSubscriptions.includes(orderId)) {
-                toggleNotificationSubscription(orderId);
-              }
-            });
-            setSelectedCoupons([]);
-            setIsBatchMode(false);
-          }
-        });
-      } else {
-        selectedCoupons.forEach(orderId => {
-          if (!notificationSubscriptions.includes(orderId)) {
-            toggleNotificationSubscription(orderId);
-          }
-        });
-        setSelectedCoupons([]);
-        setIsBatchMode(false);
-      }
-    } else {
-      setIsBatchMode(!isBatchMode);
-      if (!isBatchMode) {
-        setSelectedCoupons([]);
-      }
+      toggleNotificationSubscription(orderId);
     }
   }
 
@@ -127,9 +84,6 @@ export default function StudentDashboardPage() {
         isPreparingSection
         notificationSubscriptions={notificationSubscriptions}
         onToggleSubscription={handleToggleSubscription}
-        selectedCoupons={selectedCoupons}
-        isBatchMode={isBatchMode}
-        onBatchToggle={handleBatchToggle}
       />
     </div>
   );
@@ -144,9 +98,6 @@ interface DashboardSectionProps {
     isPreparingSection?: boolean;
     notificationSubscriptions?: string[];
     onToggleSubscription?: (orderId: string) => void;
-    selectedCoupons?: string[];
-    isBatchMode?: boolean;
-    onBatchToggle?: () => void;
 }
 
 function DashboardSection({ 
@@ -158,37 +109,14 @@ function DashboardSection({
     isPreparingSection = false, 
     notificationSubscriptions, 
     onToggleSubscription,
-    selectedCoupons = [],
-    isBatchMode = false,
-    onBatchToggle
 }: DashboardSectionProps) {
     return (
         <Card className={cn("border shadow-sm", className)}>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
                 <CardTitle className="font-headline text-2xl font-bold flex items-center gap-3 text-foreground/80">
                     {icon}
                     <span>{title} ({orders.length})</span>
                 </CardTitle>
-                {isPreparingSection && (
-                    <Button 
-                        variant={isBatchMode ? "default" : "outline"} 
-                        size="sm"
-                        onClick={onBatchToggle}
-                        className="flex items-center gap-2"
-                    >
-                        {isBatchMode ? (
-                            <>
-                                <Bell className="w-4 h-4" />
-                                <span>Turn on {selectedCoupons.length} selected</span>
-                            </>
-                        ) : (
-                            <>
-                                <BellOff className="w-4 h-4" />
-                                <span>Batch Toggle</span>
-                            </>
-                        )}
-                    </Button>
-                )}
             </CardHeader>
             <CardContent>
                 {orders.length > 0 ? (
@@ -202,10 +130,6 @@ function DashboardSection({
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.4, ease: "easeOut" }}
-                                className={cn(
-                                    "transition-all duration-200 rounded-lg",
-                                    isBatchMode && selectedCoupons.includes(order.id) ? "ring-2 ring-primary bg-primary/10" : ""
-                                )}
                             >
                                 <OrderCard 
                                     order={order} 
@@ -213,8 +137,6 @@ function DashboardSection({
                                     showBell={isPreparingSection}
                                     isSubscribed={isPreparingSection && notificationSubscriptions?.includes(order.id)}
                                     onToggleSubscription={onToggleSubscription}
-                                    isSelected={selectedCoupons.includes(order.id)}
-                                    isBatchMode={isBatchMode}
                                 />
                             </motion.div>
                         ))}
