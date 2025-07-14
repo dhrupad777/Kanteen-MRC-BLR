@@ -45,7 +45,7 @@ export function OrderCard({ order, role, onStatusChange, showBell = false, isSub
 
   return (
     <Card className={cn(
-        "flex flex-col w-full relative transition-all duration-300",
+        "flex flex-col w-full relative transition-colors duration-300",
         {
           "overflow-hidden border-0": role === 'student',
           "flex-row items-center p-0": role === 'staff',
