@@ -56,8 +56,8 @@ export default function StaffDashboardPage() {
   };
 
   const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode, className: string }[] = [
-    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "bg-sky-100/60 dark:bg-sky-900/30" },
-    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "bg-green-100/60 dark:bg-green-900/30" },
+    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "" },
+    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "" },
   ];
 
   if (loading || !user) {
@@ -98,7 +98,7 @@ export default function StaffDashboardPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 group/order"
                       >
                         <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
                         <div className="flex items-center gap-1 flex-wrap justify-end flex-1">

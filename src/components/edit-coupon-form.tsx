@@ -46,7 +46,14 @@ export function EditCouponForm({ currentCoupon, onSubmit, onCancel }: EditCoupon
             <FormItem>
               <FormLabel>New Coupon Number</FormLabel>
               <FormControl>
-                <Input type="number" min="1" max="200" {...field} />
+                <Input 
+                  type="number" 
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min="1" 
+                  max="200" 
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

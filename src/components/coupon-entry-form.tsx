@@ -53,7 +53,17 @@ export function CouponEntryForm() {
                 <FormItem className="flex-grow">
                   <FormLabel>Coupon Number</FormLabel>
                   <FormControl>
-                    <Input type="number" min="1" max="200" placeholder="e.g. 42" {...field} value={field.value ?? ''} className="bg-background"/>
+                    <Input 
+                      type="number" 
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      min="1" 
+                      max="200" 
+                      placeholder="e.g. 42" 
+                      {...field} 
+                      value={field.value ?? ''} 
+                      className="bg-background"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
