@@ -37,7 +37,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
           studentId: data.studentId,
           items: data.items,
           status: data.status,
-          createdAt: (data.createdAt as Timestamp).toDate(),
+          createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate() : new Date(),
         });
       });
 
@@ -50,10 +50,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       setOrders(ordersData);
 
       if (justReadyOrder) {
-        toast({
-            title: "Order Ready!",
-            description: `Order for coupon #${justReadyOrder.studentId.split('-')[1]} is now ready for pickup.`,
-        });
         if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
              new Notification('Kanteen Order Ready!', {
               body: `Your order for coupon #${justReadyOrder.studentId.split('-')[1]} is ready for pickup.`,
@@ -64,7 +60,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, []);
 
 
   const addOrder = useCallback(async (couponId: string) => {
@@ -105,6 +101,13 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         await updateDoc(orderRef, {
             status: newStatus
         });
+        const order = orders.find(o => o.id === orderId);
+        if (order && newStatus === 'Ready') {
+            toast({
+                title: "Order Ready!",
+                description: `Order for coupon #${order.studentId.split('-')[1]} is now ready for pickup.`,
+            });
+        }
     } catch (error) {
          console.error("Error updating document: ", error);
         toast({
@@ -113,7 +116,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             variant: "destructive"
         })
     }
-  }, [toast]);
+  }, [orders, toast]);
 
   const getOrdersByStudent = useCallback((studentId: string) => {
     return orders.filter(order => order.studentId === studentId);
