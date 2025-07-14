@@ -1,12 +1,12 @@
 
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CupSoda, CookingPot, ChefHat } from 'lucide-react';
+import { CupSoda, CookingPot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -15,6 +15,7 @@ export default function StudentDashboardPage() {
   const [currentOrders, setCurrentOrders] = useState<Order[]>([]);
 
   useEffect(() => {
+    // Request notification permission as soon as the component mounts
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
         Notification.requestPermission();

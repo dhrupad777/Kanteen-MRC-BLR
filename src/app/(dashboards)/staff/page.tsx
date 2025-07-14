@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order, OrderStatus } from '@/types';
-import { CookingPot, ChefHat, Bell } from 'lucide-react';
+import { CookingPot, ChefHat } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 import { cn } from '@/lib/utils';
 import {
@@ -29,7 +29,7 @@ import { Loader2 } from 'lucide-react';
 
 
 export default function StaffDashboardPage() {
-  const { orders, updateOrderStatus, deleteOrder, updateOrderCoupon, sendReadyNotification } = useOrders();
+  const { orders, updateOrderStatus, deleteOrder, updateOrderCoupon } = useOrders();
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { user, loading } = useAuth();
@@ -54,10 +54,6 @@ export default function StaffDashboardPage() {
     setIsEditDialogOpen(false);
     setEditingOrder(null);
   };
-
-  const handleNotificationClick = (order: Order) => {
-    sendReadyNotification(order);
-  }
 
   const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode, className: string }[] = [
     { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "" },
@@ -93,8 +89,7 @@ export default function StaffDashboardPage() {
                   </h2>
                   <div className="space-y-3">
                   <AnimatePresence>
-                  {columnOrders.length > 0 && (
-                      columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
+                  {columnOrders.sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
                       <motion.div 
                         key={order.id} 
                         layout 
@@ -104,7 +99,7 @@ export default function StaffDashboardPage() {
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         className="flex items-center gap-2 group/order"
                       >
-                        <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} onNotifyClick={handleNotificationClick} />
+                        <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
                         <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
                           {order.status === 'Preparing' && (
                             <>
@@ -144,7 +139,7 @@ export default function StaffDashboardPage() {
                         </div>
                       </motion.div>
                       ))
-                  )}
+                  }
                   </AnimatePresence>
                   </div>
               </div>

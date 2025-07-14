@@ -11,7 +11,6 @@ interface OrderCardProps {
   order: Order;
   role: 'student' | 'staff';
   onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
-  onNotifyClick?: (order: Order) => void;
 }
 
 const statusProgression: Record<string, OrderStatus | null> = {
@@ -21,7 +20,7 @@ const statusProgression: Record<string, OrderStatus | null> = {
   Completed: null,
 };
 
-export function OrderCard({ order, role, onStatusChange, onNotifyClick }: OrderCardProps) {
+export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
   const nextStatus = statusProgression[order.status];
 
   const handleStatusUpdate = () => {
@@ -42,26 +41,18 @@ export function OrderCard({ order, role, onStatusChange, onNotifyClick }: OrderC
           "flex-row items-center p-0": role === 'staff',
         }
       )}>
-      {role === 'staff' && order.status === 'Preparing' && onNotifyClick && (
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="absolute top-1 right-1 h-7 w-7 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all rounded-full"
-          onClick={() => onNotifyClick(order)}
-        >
-          <Bell className="h-4 w-4" />
-          <span className="sr-only">Send Ready Notification</span>
-        </Button>
+       {role === 'student' && (
+        <Bell className="absolute top-2 right-2 h-5 w-5 text-amber-500" />
       )}
       <CardContent className={cn("flex-grow flex flex-col justify-center items-center text-center", {
         "p-0": role === 'student',
         "p-0 flex-shrink-0": role === 'staff'
       })}>
         <div className={cn(
-            "rounded-lg p-2 w-full font-bold tracking-wider",
+            "rounded-lg p-2 w-full font-bold tracking-wider font-mono tabular-nums",
             order.status === 'Preparing' && 'bg-blue-100/80 text-blue-900',
             order.status === 'Ready' && 'bg-green-100/80 text-green-900',
-            role === 'student' ? 'text-6xl p-6' : 'text-4xl px-4 font-mono tabular-nums'
+            role === 'student' ? 'text-6xl p-6' : 'text-5xl px-4'
           )}>
             <p className="tabular-nums font-mono">{couponId}</p>
         </div>

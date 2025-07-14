@@ -16,7 +16,6 @@ interface OrderContextType {
   updateOrderCoupon: (orderId: string, newCouponId: string) => void;
   getOrdersByStudent: (studentId: string) => Order[];
   getOrdersByStatus: (status: OrderStatus) => Order[];
-  sendReadyNotification: (order: Order) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -37,19 +36,9 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
           body: `Your order for coupon #${order.studentId.split('-')[1]} is ready for pickup.`,
           icon: '/favicon.ico'
         });
-        toast({
-          title: "Notification Sent",
-          description: `Customer with coupon #${order.studentId.split('-')[1]} has been notified.`,
-        });
-      } else {
-        toast({
-          title: "Notification Permission Denied",
-          description: "Cannot send notification. Please check browser permissions.",
-          variant: "destructive"
-        });
       }
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
@@ -211,7 +200,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     updateOrderCoupon,
     getOrdersByStudent,
     getOrdersByStatus,
-    sendReadyNotification,
   };
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
