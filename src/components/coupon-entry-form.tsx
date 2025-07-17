@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -45,7 +46,7 @@ export function CouponEntryForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-end gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
             <FormField
               control={form.control}
               name="couponId"
@@ -69,7 +70,7 @@ export function CouponEntryForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="w-full sm:w-auto">
+            <Button type="submit" size="lg" className="w-full sm:w-auto flex-shrink-0">
               <PlusCircle />
               Add Order
             </Button>
