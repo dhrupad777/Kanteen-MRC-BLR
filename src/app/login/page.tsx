@@ -28,7 +28,7 @@ import { useEffect, useState } from 'react';
 import { KanteenHeader } from '@/components/kanteen-header';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 import Link from 'next/link';
 
 const formSchema = z.object({
@@ -130,6 +130,19 @@ export default function LoginPage() {
                 </Button>
               </form>
             </Form>
+             <Alert className="mt-6">
+                <Info className="h-4 w-4" />
+                <AlertTitle>Demo Credentials</AlertTitle>
+                <AlertDescription>
+                    <div className="text-sm">
+                        <p><b>Email:</b> mrc@gmail.com</p>
+                        <p><b>Password:</b> 123456</p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                        Note: These credentials are provided for prototype review purposes only.
+                        </p>
+                    </div>
+                </AlertDescription>
+            </Alert>
           </CardContent>
            <CardFooter className="text-center text-sm">
             <p className="w-full">
