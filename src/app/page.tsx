@@ -1,34 +1,39 @@
 
 import Link from 'next/link';
-import { User, ChefHat } from 'lucide-react';
+import { User, UserCog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function RoleSelectionPage() {
   return (
     <>
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+      <Link href="/login" passHref legacyBehavior>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 md:top-6 md:right-6 h-12 w-12 rounded-full bg-muted hover:bg-muted/80"
+          >
+            <UserCog className="h-6 w-6 text-muted-foreground" />
+            <span className="sr-only">Order Manager Login</span>
+          </Button>
+      </Link>
       <header className="text-center mb-8 flex flex-col items-center">
-        <ChefHat className="w-24 h-24 md:w-40 md:h-40 mb-4 text-primary" strokeWidth={1} />
+        <User className="w-24 h-24 md:w-40 md:h-40 mb-4 text-primary" strokeWidth={1} />
         <h1 className="font-headline text-4xl md:text-7xl font-bold text-primary tracking-tighter">
           Kanteen
         </h1>
         <p className="text-muted-foreground text-base md:text-lg mt-2 max-w-md">
-          Your Campus Canteen Companion. Select your role to get started.
+          Your Campus Canteen Companion.
         </p>
       </header>
 
-      <main className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-4xl">
+      <main className="flex justify-center w-full max-w-md">
         <RoleCard
           href="/student"
           icon={<User className="w-10 h-10 md:w-12 md:h-12 text-primary" />}
           title="Customer"
           description="View the live order status display."
-        />
-        <RoleCard
-          href="/login"
-          icon={<ChefHat className="w-10 h-10 md:w-12 md:h-12 text-primary" />}
-          title="Order Manager"
-          description="Manage orders and get kitchen insights."
         />
       </main>
       <footer className="mt-16 text-center text-muted-foreground text-sm">
@@ -48,7 +53,7 @@ interface RoleCardProps {
 
 function RoleCard({ href, icon, title, description }: RoleCardProps) {
   return (
-    <Link href={href} className="group block">
+    <Link href={href} className="group block w-full">
       <Card className="h-full hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out border-2 border-transparent hover:border-primary/80 bg-card/60 backdrop-blur-sm p-2 md:p-4">
         <CardHeader className="flex flex-col items-center text-center">
           <div className="p-3 md:p-4 bg-primary/10 rounded-full mb-4 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">{icon}</div>
