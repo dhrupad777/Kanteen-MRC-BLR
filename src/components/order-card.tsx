@@ -49,7 +49,7 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
       })}>
         <div className={cn(
             "rounded-lg p-2 w-full font-bold tracking-wider transition-colors duration-300",
-            role === 'student' ? 'text-4xl md:text-5xl lg:text-6xl p-4 md:p-6' : 'text-2xl px-3 py-1',
+            role === 'student' ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl p-4 md:p-6' : 'text-xl px-2 py-1',
             {
               'bg-blue-200/90 dark:bg-blue-900/50 text-blue-900 dark:text-blue-200': order.status === 'Preparing',
               'bg-green-200/90 dark:bg-green-900/50 text-green-900 dark:text-green-200': order.status === 'Ready',
