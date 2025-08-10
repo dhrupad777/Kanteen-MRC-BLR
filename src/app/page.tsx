@@ -8,7 +8,7 @@ export default function RoleSelectionPage() {
   return (
     <>
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <Link href="/login" passHref legacyBehavior>
+      <Link href="/login">
           <Button
             variant="ghost"
             size="icon"
@@ -19,16 +19,16 @@ export default function RoleSelectionPage() {
           </Button>
       </Link>
       <header className="text-center mb-8 flex flex-col items-center">
-        <User className="w-24 h-24 md:w-40 md:h-40 mb-4 text-primary" strokeWidth={1} />
-        <h1 className="font-headline text-4xl md:text-7xl font-bold text-primary tracking-tighter">
+        <User className="w-16 h-16 md:w-24 md:h-24 mb-4 text-primary" strokeWidth={1} />
+        <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tighter">
           Kanteen
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg mt-2 max-w-md">
+        <p className="text-muted-foreground text-sm md:text-base mt-2 max-w-md">
           Your Campus Canteen Companion.
         </p>
       </header>
 
-      <main className="flex justify-center w-full max-w-md">
+      <main className="flex justify-center w-full max-w-xs sm:max-w-sm">
         <RoleCard
           href="/student"
           icon={<User className="w-10 h-10 md:w-12 md:h-12 text-primary" />}
