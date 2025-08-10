@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { User, UserCog } from 'lucide-react';
+import { UserCog, ChefHat, ClipboardList } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +19,7 @@ export default function RoleSelectionPage() {
           </Button>
       </Link>
       <header className="text-center mb-8 flex flex-col items-center">
-        <User className="w-16 h-16 md:w-24 md:h-24 mb-4 text-primary" strokeWidth={1} />
+        <ChefHat className="w-16 h-16 md:w-24 md:h-24 mb-4 text-primary" strokeWidth={1} />
         <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tighter">
           Kanteen
         </h1>
@@ -31,8 +31,8 @@ export default function RoleSelectionPage() {
       <main className="flex justify-center w-full max-w-xs sm:max-w-sm">
         <RoleCard
           href="/student"
-          icon={<User className="w-10 h-10 md:w-12 md:h-12 text-primary" />}
-          title="Customer"
+          icon={<ClipboardList className="w-10 h-10 md:w-12 md:h-12 text-primary" />}
+          title="Order Status"
           description="View the live order status display."
         />
       </main>
