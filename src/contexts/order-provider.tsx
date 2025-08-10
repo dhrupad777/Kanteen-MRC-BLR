@@ -9,7 +9,7 @@ import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTim
 
 interface OrderContextType {
   orders: Order[];
-  addOrder: (couponId: string) => void;
+  addOrder: (couponId: string) => Promise<void>;
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
   deleteOrder: (orderId: string) => void;
   updateOrderCoupon: (orderId: string, newCouponId: string) => void;
@@ -50,8 +50,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const addOrder = useCallback(async (couponId: string) => {
     const activeOrder = orders.find(o => o.studentId === `student-${couponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
       if (activeOrder) {
-        console.warn(`Coupon #${couponId} is already in the queue.`);
-        return;
+        throw new Error(`Coupon #${couponId} is already in the queue.`);
       }
     
     try {
@@ -63,6 +62,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (error) {
         console.error("Error adding document: ", error);
+        throw error;
     }
   }, [orders]);
 

@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Ticket, PlusCircle } from 'lucide-react';
+import { Ticket, PlusCircle, AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   couponId: z.coerce
@@ -22,6 +23,7 @@ const formSchema = z.object({
 
 export function CouponEntryForm() {
   const { addOrder } = useOrders();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,9 +32,17 @@ export function CouponEntryForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    addOrder(values.couponId.toString());
-    form.reset({couponId: undefined});
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+        await addOrder(values.couponId.toString());
+        form.reset({couponId: undefined});
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Duplicate Order",
+            description: error.message,
+        })
+    }
   }
 
   return (

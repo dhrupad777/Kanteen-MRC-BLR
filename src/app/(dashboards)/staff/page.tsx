@@ -101,7 +101,7 @@ export default function StaffDashboardPage() {
                           className="flex items-center gap-2"
                         >
                           <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
-                          <div className="flex items-center gap-1 flex-wrap justify-end flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap justify-end flex-1 ml-auto">
                             {order.status === 'Preparing' && (
                               <>
                                 <Button variant="outline" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110" onClick={() => handleEditClick(order)}>
