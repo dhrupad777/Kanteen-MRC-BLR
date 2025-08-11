@@ -69,3 +69,17 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+@layer utilities {
+    @keyframes pulse-border {
+        0%, 100% {
+            box-shadow: 0 0 0 0 hsl(var(--primary) / 0.7);
+        }
+        50% {
+            box-shadow: 0 0 0 4px hsl(var(--primary) / 0);
+        }
+    }
+    .animate-pulse-border {
+        animation: pulse-border 2s infinite;
+    }
+}
