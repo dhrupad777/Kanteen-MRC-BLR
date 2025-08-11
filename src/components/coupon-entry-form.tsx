@@ -18,7 +18,7 @@ const formSchema = z.object({
     .int()
     .positive("Coupon number must be a positive number.")
     .min(1, 'Coupon number must be at least 1.')
-    .max(200, 'Coupon number must be no more than 200.'),
+    .max(300, 'Coupon number must be no more than 300.'),
 });
 
 export function CouponEntryForm() {
@@ -52,7 +52,7 @@ export function CouponEntryForm() {
             <Ticket className="text-primary"/>
             Create New Order
         </CardTitle>
-        <CardDescription>Enter a coupon number (1-200) to add an order to the 'Preparing' queue.</CardDescription>
+        <CardDescription>Enter a coupon number (1-300) to add an order to the 'Preparing' queue.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -69,7 +69,7 @@ export function CouponEntryForm() {
                       inputMode="numeric"
                       pattern="[0-9]*"
                       min="1" 
-                      max="200" 
+                      max="300" 
                       placeholder="e.g. 42" 
                       {...field} 
                       value={field.value ?? ''} 
