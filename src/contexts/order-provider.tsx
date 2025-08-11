@@ -6,6 +6,7 @@ import React, { createContext, useCallback, useContext, useState, useEffect, use
 import { Order, OrderStatus } from '@/types';
 import { db } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
+import { toast } from "@/hooks/use-toast";
 
 interface OrderContextType {
   orders: Order[];
@@ -96,7 +97,11 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
     const activeOrder = orders.find(o => o.studentId === `student-${newCouponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
       if (activeOrder) {
-        console.warn(`Coupon #${newCouponId} is already in the queue.`);
+        toast({
+            variant: "destructive",
+            title: "Duplicate Order",
+            description: `Coupon #${newCouponId} is already in the queue.`,
+        })
         return;
       }
 
@@ -115,7 +120,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     return orders.filter(order => order.studentId === studentId);
   }, [orders]);
 
-  const getOrdersByStatus = useCallback((status: Order_Status) => {
+  const getOrdersByStatus = useCallback((status: OrderStatus) => {
     return orders.filter(order => order.status === status);
   }, [orders]);
 
@@ -139,6 +144,3 @@ export const useOrders = (): OrderContextType => {
   }
   return context;
 };
-
-// Helper type to handle both string and the specific statuses
-type Order_Status = OrderStatus | 'Archived';
