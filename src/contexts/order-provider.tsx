@@ -5,11 +5,12 @@ import type { ReactNode } from "react";
 import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { Order, OrderStatus } from '@/types';
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
+import { collection, doc, addDoc, updateDoc, onSnapshot, query, where, serverTimestamp, Timestamp, deleteDoc, limit, orderBy } from "firebase/firestore";
 import { toast } from "@/hooks/use-toast";
 
 interface OrderContextType {
   orders: Order[];
+  loading: boolean;
   addOrder: (couponId: string) => Promise<void>;
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
   deleteOrder: (orderId: string) => void;
@@ -22,9 +23,15 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "orders"), where("status", "in", ["Preparing", "Ready"]));
+    const q = query(
+        collection(db, "orders"), 
+        where("status", "in", ["Preparing", "Ready"]),
+        orderBy("createdAt", "asc"),
+        limit(100) // Limit initial load for performance
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const newOrders: Order[] = [];
         snapshot.forEach((doc) => {
@@ -39,9 +46,11 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         });
         
         setOrders(newOrders);
+        setLoading(false);
 
     }, (error) => {
         console.error("Error with Firestore snapshot: ", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();
@@ -126,6 +135,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     orders,
+    loading,
     addOrder,
     updateOrderStatus,
     deleteOrder,

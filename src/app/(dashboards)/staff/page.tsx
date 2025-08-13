@@ -29,17 +29,17 @@ import { Loader2 } from 'lucide-react';
 
 
 export default function StaffDashboardPage() {
-  const { orders, updateOrderStatus, deleteOrder, updateOrderCoupon } = useOrders();
+  const { orders, loading: ordersLoading, updateOrderStatus, deleteOrder, updateOrderCoupon } = useOrders();
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [user, authLoading, router]);
 
 
   const handleEditClick = (order: Order) => {
@@ -59,8 +59,11 @@ export default function StaffDashboardPage() {
     { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "" },
     { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "" },
   ];
+  
+  const isLoading = authLoading || ordersLoading;
 
-  if (loading || !user) {
+
+  if (isLoading || !user) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />

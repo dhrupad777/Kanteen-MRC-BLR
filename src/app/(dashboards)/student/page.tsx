@@ -6,16 +6,24 @@ import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { CupSoda, CookingPot } from 'lucide-react';
+import { CupSoda, CookingPot, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function StudentDashboardPage() {
-  const { orders } = useOrders();
+  const { orders, loading } = useOrders();
 
   const readyOrders = orders.filter(o => o.status === 'Ready');
   const preparingOrders = orders.filter(o => o.status === 'Preparing');
   
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -23,7 +31,7 @@ export default function StudentDashboardPage() {
         <p className="text-muted-foreground mt-1">Track the real-time status of all food orders.</p>
       </div>
 
-       {orders.length === 0 && (
+       {orders.length === 0 && !loading && (
         <Card className="text-center">
             <CardHeader>
                 <CardTitle>No Active Orders</CardTitle>
