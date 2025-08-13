@@ -131,14 +131,6 @@ export default function LoginPage() {
               </form>
             </Form>
           </CardContent>
-           <CardFooter className="text-center text-sm">
-            <p className="w-full">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="underline text-primary hover:text-primary/80">
-                Sign up
-              </Link>
-            </p>
-          </CardFooter>
         </Card>
       </div>
     </>

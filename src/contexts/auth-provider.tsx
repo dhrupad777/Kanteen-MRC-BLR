@@ -3,9 +3,9 @@
 
 import type { ReactNode } from "react";
 import React, { createContext, useState, useEffect } from 'react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import type { UserProfile } from "@/types";
 
 interface AuthContextType {
@@ -13,7 +13,6 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   signInWithEmail: (email: string, password: string) => Promise<any>;
-  signUpWithEmail: (email: string, password: string, profileData: Partial<Omit<UserProfile, 'uid'>>) => Promise<any>;
   signOutUser: () => Promise<void>;
 }
 
@@ -56,29 +55,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signUpWithEmail = async (email: string, password: string, profileData: Partial<Omit<UserProfile, 'uid'>>) => {
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        const userRef = doc(db, "users", user.uid);
-        
-        const dataToSet: UserProfile = {
-          uid: user.uid,
-          name: profileData.name || '',
-          email: user.email || '',
-          role: 'manager',
-        };
-        
-        await setDoc(userRef, dataToSet);
-
-        return userCredential;
-    } catch(error) {
-        console.error("Error during sign up:", error);
-        throw error;
-    }
-  }
-
   const signOutUser = () => {
     return signOut(auth);
   };
@@ -88,7 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     userProfile,
     loading,
     signInWithEmail,
-    signUpWithEmail,
     signOutUser,
   };
 
