@@ -37,6 +37,9 @@ export default function StudentDashboardPage() {
                 <CardTitle>No Active Orders</CardTitle>
                 <CardDescription>The kitchen is quiet right now. No orders are being tracked.</CardDescription>
             </CardHeader>
+            <CardContent>
+                <p className="text-sm text-muted-foreground italic">Not seeing your order? Try giving the page a quick refresh!</p>
+            </CardContent>
         </Card>
       )}
 
