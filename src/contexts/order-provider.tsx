@@ -29,7 +29,6 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     const q = query(
         collection(db, "orders"), 
         where("status", "in", ["Preparing", "Ready"]),
-        orderBy("createdAt", "asc"),
         limit(100) // Limit initial load for performance
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -45,6 +44,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             });
         });
         
+        // Manual sort on the client-side
+        newOrders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
         setOrders(newOrders);
         setLoading(false);
 
