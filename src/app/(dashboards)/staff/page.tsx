@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order, OrderStatus } from '@/types';
-import { CookingPot, ChefHat } from 'lucide-react';
+import { ChefHat } from 'lucide-react';
 import { CouponEntryForm } from '@/components/coupon-entry-form';
 import { cn } from '@/lib/utils';
 import {
@@ -20,7 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Undo2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { EditCouponForm } from '@/components/edit-coupon-form';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/hooks/use-auth';
@@ -29,7 +29,7 @@ import { Loader2 } from 'lucide-react';
 
 
 export default function StaffDashboardPage() {
-  const { orders, loading: ordersLoading, updateOrderStatus, deleteOrder, updateOrderCoupon } = useOrders();
+  const { orders, loading: ordersLoading, deleteOrder, updateOrderCoupon } = useOrders();
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { user, loading: authLoading } = useAuth();
@@ -55,10 +55,7 @@ export default function StaffDashboardPage() {
     setEditingOrder(null);
   };
 
-  const orderColumns: { title: string; status: OrderStatus, icon: React.ReactNode, className: string }[] = [
-    { title: 'Preparing', status: 'Preparing', icon: <CookingPot className="mr-2 h-5 w-5 text-blue-800" />, className: "" },
-    { title: 'Ready', status: 'Ready', icon: <ChefHat className="mr-2 h-5 w-5 text-green-800" />, className: "" },
-  ];
+  const readyOrders = orders.filter(o => o.status === 'Ready');
   
   const isLoading = authLoading || ordersLoading;
 
@@ -82,18 +79,15 @@ export default function StaffDashboardPage() {
       <div className="space-y-8 pt-4">
         <CouponEntryForm />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-          {orderColumns.map(column => {
-            const columnOrders = orders.filter(o => o.status === column.status);
-            return (
-              <div key={column.title} className={cn("space-y-4 p-4 rounded-xl h-full", column.className)}>
+            <div className="space-y-4 p-4 rounded-xl h-full md:col-span-2">
                 <h2 className="font-headline text-xl font-semibold flex items-center px-2 text-foreground/80">
-                  {column.icon}
-                  {column.title} ({columnOrders.length})
+                  <ChefHat className="mr-2 h-5 w-5 text-green-800" />
+                  Ready to Collect ({readyOrders.length})
                 </h2>
                 <div className="space-y-3">
                   <AnimatePresence>
-                    {columnOrders.length > 0 ? (
-                      columnOrders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
+                    {readyOrders.length > 0 ? (
+                      readyOrders.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).map(order => (
                         <motion.div
                           key={order.id}
                           layout
@@ -103,10 +97,8 @@ export default function StaffDashboardPage() {
                           transition={{ duration: 0.3, ease: "easeInOut" }}
                           className="flex items-center gap-2"
                         >
-                          <OrderCard order={order} role="staff" onStatusChange={updateOrderStatus} />
+                          <OrderCard order={order} role="staff" />
                           <div className="flex items-center gap-1.5 flex-wrap justify-end flex-1 ml-auto">
-                            {order.status === 'Preparing' && (
-                              <>
                                 <Button variant="outline" size="icon" className="h-8 w-8 transition-transform duration-200 ease-in-out hover:scale-110" onClick={() => handleEditClick(order)}>
                                   <Edit className="h-4 w-4" />
                                   <span className="sr-only">Edit</span>
@@ -133,13 +125,6 @@ export default function StaffDashboardPage() {
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
                                 </AlertDialog>
-                              </>
-                            )}
-                            {order.status === 'Ready' && (
-                              <Button variant="outline" size="sm" className="transition-transform duration-200 ease-in-out hover:scale-105" onClick={() => updateOrderStatus(order.id, 'Preparing')}>
-                                <Undo2 className="mr-1 h-3 w-3" /> Back
-                              </Button>
-                            )}
                           </div>
                         </motion.div>
                       ))
@@ -147,8 +132,6 @@ export default function StaffDashboardPage() {
                   </AnimatePresence>
                 </div>
               </div>
-            );
-          })}
         </div>
       </div>
 

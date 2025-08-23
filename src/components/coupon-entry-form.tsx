@@ -52,7 +52,7 @@ export function CouponEntryForm() {
             <Ticket className="text-primary"/>
             Create New Order
         </CardTitle>
-        <CardDescription>Enter a coupon number (1-300) to add an order to the 'Preparing' queue.</CardDescription>
+        <CardDescription>Enter a coupon number (1-300) to add an order to the 'Ready' queue.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

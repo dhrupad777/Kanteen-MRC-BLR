@@ -6,7 +6,7 @@ import { useOrders } from '@/contexts/order-provider';
 import { OrderCard } from '@/components/order-card';
 import { Order } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { CupSoda, CookingPot, Loader2 } from 'lucide-react';
+import { CupSoda, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -14,7 +14,6 @@ export default function StudentDashboardPage() {
   const { orders, loading } = useOrders();
 
   const readyOrders = orders.filter(o => o.status === 'Ready');
-  const preparingOrders = orders.filter(o => o.status === 'Preparing');
   
   if (loading) {
     return (
@@ -53,15 +52,6 @@ export default function StudentDashboardPage() {
         />
       )}
 
-      {preparingOrders.length > 0 && (
-        <DashboardSection
-            title="Currently Preparing"
-            icon={<CookingPot className="w-6 h-6 text-blue-800"/>}
-            orders={preparingOrders}
-            emptyMessage="You have no orders being prepared."
-            className="bg-sky-100/60 dark:bg-sky-900/30 border-sky-300/20 dark:border-sky-700/50"
-        />
-      )}
     </div>
   );
 }

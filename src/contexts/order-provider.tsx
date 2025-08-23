@@ -28,7 +28,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const q = query(
         collection(db, "orders"), 
-        where("status", "in", ["Preparing", "Ready"]),
+        where("status", "in", ["Ready"]),
         limit(100) // Limit initial load for performance
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -59,7 +59,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
 
   const addOrder = useCallback(async (couponId: string) => {
-    const activeOrder = orders.find(o => o.studentId === `student-${couponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
+    const activeOrder = orders.find(o => o.studentId === `student-${couponId}` && (o.status === 'Ready'));
       if (activeOrder) {
         throw new Error(`Coupon #${couponId} is already in the queue.`);
       }
@@ -68,7 +68,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       await addDoc(collection(db, "orders"), {
         studentId: `student-${couponId}`,
         items: [{ name: 'Coupon Meal', quantity: 1 }],
-        status: 'Preparing',
+        status: 'Ready',
         createdAt: serverTimestamp(),
       });
     } catch (error) {
@@ -105,7 +105,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   }, [deleteOrder]);
 
   const updateOrderCoupon = useCallback(async (orderId: string, newCouponId: string) => {
-    const activeOrder = orders.find(o => o.studentId === `student-${newCouponId}` && (o.status === 'Preparing' || o.status === 'Ready'));
+    const activeOrder = orders.find(o => o.studentId === `student-${newCouponId}` && (o.status === 'Ready'));
       if (activeOrder) {
         toast({
             variant: "destructive",

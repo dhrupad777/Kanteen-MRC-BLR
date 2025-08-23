@@ -4,33 +4,22 @@
 import type { Order, OrderStatus } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "./ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useOrders } from "@/contexts/order-provider";
 
 interface OrderCardProps {
   order: Order;
   role: 'student' | 'staff';
-  onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
 }
 
-const statusProgression: Record<string, OrderStatus | null> = {
-  Pending: 'Preparing',
-  Preparing: 'Ready',
-  Ready: 'Completed',
-  Completed: null,
-};
-
-export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
-  const nextStatus = statusProgression[order.status];
+export function OrderCard({ order, role }: OrderCardProps) {
+  const { updateOrderStatus } = useOrders();
   
   const couponId = order.studentId.split('-')[1] || order.id;
 
-  const buttonText = nextStatus === 'Ready' ? 'Ready' : 'Collected';
-
   const handleStatusUpdate = () => {
-    if (nextStatus && onStatusChange) {
-      onStatusChange(order.id, nextStatus);
-    }
+      updateOrderStatus(order.id, 'Completed');
   };
 
   return (
@@ -58,11 +47,11 @@ export function OrderCard({ order, role, onStatusChange }: OrderCardProps) {
             <p className="font-mono tabular-nums">{couponId}</p>
         </div>
       </CardContent>
-      {role === 'staff' && nextStatus && (
+      {role === 'staff' && (
         <CardFooter className="p-0 pl-1 pr-2 flex-grow">
           <Button onClick={handleStatusUpdate} size="sm" className="bg-primary hover:bg-primary/90 transition-colors font-semibold h-8 text-xs hover:scale-105 transform duration-200 ease-in-out px-2 py-1">
-            {buttonText === "Ready" ? <ArrowRight className="mr-1 h-3 w-3" /> : <Check className="mr-1 h-3 w-3" />}
-            <span>{buttonText}</span>
+            <Check className="mr-1 h-3 w-3" />
+            <span>Collected</span>
           </Button>
         </CardFooter>
       )}
