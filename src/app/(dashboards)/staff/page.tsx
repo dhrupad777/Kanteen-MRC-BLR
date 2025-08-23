@@ -93,7 +93,7 @@ export default function StaffDashboardPage() {
                           layout
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
+                          exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.3 } }}
                           transition={{ duration: 0.3, ease: "easeInOut" }}
                           className="flex items-center gap-2"
                         >
