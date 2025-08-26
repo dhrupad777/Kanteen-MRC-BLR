@@ -27,7 +27,7 @@ interface CouponGridProps {
 }
 
 export function CouponGrid({ orders }: CouponGridProps) {
-  const { deleteOrder, updateOrderCoupon } = useOrders();
+  const { addOrder, deleteOrder, updateOrderCoupon } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -50,6 +50,8 @@ export function CouponGrid({ orders }: CouponGridProps) {
     const order = activeOrdersMap.get(couponId);
     if (order) {
       deleteOrder(order.id); // Mark as collected
+    } else {
+      addOrder(couponId.toString()); // Add new order
     }
   };
 
@@ -182,7 +184,7 @@ export function CouponGrid({ orders }: CouponGridProps) {
                 <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    This will permanently delete the order for coupon #{selectedOrder.studentId.split('-')[1]}. This action cannot be undone.
+                    This will permanently delete the order for coupon #{selected.studentId.split('-')[1]}. This action cannot be undone.
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
