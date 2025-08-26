@@ -65,14 +65,14 @@ export function CouponGrid({ orders }: CouponGridProps) {
     }
   };
 
-  const handleMouseUp = () => {
+  const clearLongPressTimer = () => {
     if(longPressTimer.current) {
         clearTimeout(longPressTimer.current);
     }
   };
   
   const handleTouchStart = (couponId: number) => handleMouseDown(couponId);
-  const handleTouchEnd = () => handleMouseUp();
+  const handleTouchEnd = () => clearLongPressTimer();
 
 
   const handleEdit = () => {
@@ -128,10 +128,13 @@ export function CouponGrid({ orders }: CouponGridProps) {
                         isActive ? 'bg-primary text-primary-foreground shadow-lg hover:bg-primary/90' : 'bg-card text-card-foreground/70 hover:bg-muted',
                         'hover:scale-105 active:scale-95'
                     )}
-                    onClick={() => handleButtonClick(couponId)}
+                    onClick={() => {
+                        clearLongPressTimer();
+                        handleButtonClick(couponId);
+                    }}
                     onMouseDown={() => handleMouseDown(couponId)}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
+                    onMouseUp={clearLongPressTimer}
+                    onMouseLeave={clearLongPressTimer}
                     onTouchStart={() => handleTouchStart(couponId)}
                     onTouchEnd={handleTouchEnd}
                     >
@@ -184,7 +187,7 @@ export function CouponGrid({ orders }: CouponGridProps) {
                 <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    This will permanently delete the order for coupon #{selected.studentId.split('-')[1]}. This action cannot be undone.
+                    This will permanently delete the order for coupon #{selectedOrder.studentId.split('-')[1]}. This action cannot be undone.
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
