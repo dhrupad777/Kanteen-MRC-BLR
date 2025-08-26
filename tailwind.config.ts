@@ -17,6 +17,10 @@ const config = {
       },
     },
     extend: {
+      gridTemplateColumns: {
+        '15': 'repeat(15, minmax(0, 1fr))',
+        '20': 'repeat(20, minmax(0, 1fr))',
+      },
       fontFamily: {
         body: ['var(--font-inter)', 'sans-serif'],
         headline: ['var(--font-poppins)', 'sans-serif'],

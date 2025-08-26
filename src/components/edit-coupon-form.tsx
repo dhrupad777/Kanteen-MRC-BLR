@@ -7,7 +7,8 @@ import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { AlertDialogFooter, AlertDialogCancel } from '@/components/ui/alert-dialog';
+import { DialogFooter } from '@/components/ui/dialog';
+import { AlertDialogCancel } from './ui/alert-dialog';
 
 const formSchema = z.object({
   couponId: z.coerce
@@ -38,7 +39,7 @@ export function EditCouponForm({ currentCoupon, onSubmit, onCancel }: EditCoupon
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 pt-4">
         <FormField
           control={form.control}
           name="couponId"
@@ -59,10 +60,10 @@ export function EditCouponForm({ currentCoupon, onSubmit, onCancel }: EditCoupon
             </FormItem>
           )}
         />
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
           <Button type="submit">Save Changes</Button>
-        </AlertDialogFooter>
+        </DialogFooter>
       </form>
     </Form>
   );
