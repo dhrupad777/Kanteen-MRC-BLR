@@ -98,7 +98,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="manager@kanteen.com" {...field} />
+                        <Input placeholder="manager@kanteen-mrc.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

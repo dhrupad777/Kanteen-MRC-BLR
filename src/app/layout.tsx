@@ -18,7 +18,7 @@ const poppins = Poppins({
 
 
 export const metadata: Metadata = {
-  title: 'Kanteen',
+  title: 'Kanteen MRC',
   description: 'Canteen Order Management System',
 };
 

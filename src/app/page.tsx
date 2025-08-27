@@ -21,7 +21,7 @@ export default function RoleSelectionPage() {
       <header className="text-center mb-8 flex flex-col items-center">
         <ChefHat className="w-16 h-16 md:w-24 md:h-24 mb-4 text-primary" strokeWidth={1} />
         <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary tracking-tighter">
-          Kanteen
+          Kanteen <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">MRC</span>
         </h1>
         <p className="text-muted-foreground text-sm md:text-base mt-2 max-w-md">
           Your Campus Canteen Companion.
@@ -37,7 +37,7 @@ export default function RoleSelectionPage() {
         />
       </main>
       <footer className="mt-16 text-center text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} Kanteen. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Kanteen MRC. All rights reserved.</p>
       </footer>
     </div>
     </>
