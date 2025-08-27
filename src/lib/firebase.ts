@@ -8,13 +8,13 @@ import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAfEL-nZQsRR72PmX1npnP3GrrFeT4SQDI",
-  authDomain: "kanteen-as.firebaseapp.com",
-  projectId: "kanteen-as",
-  storageBucket: "kanteen-as.appspot.com",
-  messagingSenderId: "1013880615923",
-  appId: "1:1013880615923:web:db75dcc21bf8dc71f11886",
-  measurementId: "G-GGP9E9CH6M"
+  apiKey: "AIzaSyDXkt7jhkENyEejYbKFZNQzuX4uyru269I",
+  authDomain: "kanteen-gm6uq.firebaseapp.com",
+  projectId: "kanteen-gm6uq",
+  storageBucket: "kanteen-gm6uq.appspot.com",
+  messagingSenderId: "190244278779",
+  appId: "1:190244278779:web:db66a2136dcae7db45bb5e",
+  measurementId: "G-9FCB95HMZ5"
 };
 
 
