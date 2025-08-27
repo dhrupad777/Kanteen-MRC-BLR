@@ -2,17 +2,19 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAfEL-nZQsRR72PmX1npnP3GrrFeT4SQDI",
+  authDomain: "kanteen-as.firebaseapp.com",
+  projectId: "kanteen-as",
+  storageBucket: "kanteen-as.appspot.com",
+  messagingSenderId: "1013880615923",
+  appId: "1:1013880615923:web:db75dcc21bf8dc71f11886",
+  measurementId: "G-GGP9E9CH6M"
 };
 
 
@@ -20,5 +22,7 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 const auth = getAuth(app);
+// const analytics = getAnalytics(app);
+
 
 export { app, db, auth };
