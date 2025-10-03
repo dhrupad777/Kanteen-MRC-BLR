@@ -29,7 +29,7 @@ export function KanteenHeader() {
         <Link href="/" className="flex items-center gap-2 mr-auto">
           <ChefHat className="h-7 w-7 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">
-            Kanteen <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">MRC</span>
+            Kanteen <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">MRC BLR</span>
           </span>
         </Link>
         
