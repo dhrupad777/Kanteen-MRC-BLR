@@ -8,16 +8,29 @@ import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD8-YXP-aTCVzUPipIZgzSW_Vy6yeEiogQ",
-  authDomain: "kanteen-blr.firebaseapp.com",
-  projectId: "kanteen-blr",
-  storageBucket: "kanteen-blr.firebasestorage.app",
-  messagingSenderId: "325547619001",
-  appId: "1:325547619001:web:63bc435b8abf8c5a042168",
-  measurementId: "G-459CHSXHH3"
+  apiKey: "AIzaSyCUhOLuVBtHhhFglEYTDyp7GIIs5W2VA-Q",
+  authDomain: "kanteen-mrc-blr-24cfa.firebaseapp.com",
+  projectId: "kanteen-mrc-blr-24cfa",
+  storageBucket: "kanteen-mrc-blr-24cfa.firebasestorage.app",
+  messagingSenderId: "1054581883069",
+  appId: "1:1054581883069:web:44dc089a179f47f17637d4",
+  measurementId: "G-NM1NM2DTTL"
 };
 
 
+
+/*
+const firebaseConfig = {
+  apiKey: "AIzaSyCUhOLuVBtHhhFglEYTDyp7GIIs5W2VA-Q",
+  authDomain: "kanteen-mrc-blr-24cfa.firebaseapp.com",
+  projectId: "kanteen-mrc-blr-24cfa",
+  storageBucket: "kanteen-mrc-blr-24cfa.firebasestorage.app",
+  messagingSenderId: "1054581883069",
+  appId: "1:1054581883069:web:44dc089a179f47f17637d4",
+  measurementId: "G-NM1NM2DTTL"
+};
+
+*/
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
